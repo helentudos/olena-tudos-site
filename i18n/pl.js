@@ -104,6 +104,7 @@ window.I18N.pl = {
   "cases.pd.wf4": "Leady: bot AI w Telegramie rozpoznaje zamiar, zbiera imię, telefon i usługę → CRM (Google Sheets) → powiadomienie dla recepcji.",
   "cases.pd.wf5": "Zapisy online: formularz Typeform → wydarzenie w Google Calendar → potwierdzenie HTML dla pacjenta → powiadomienie dla recepcji.",
   "cases.pd.wf6": "Raport tygodniowy: w każdy poniedziałek o 9:00 podsumowanie w Telegramie (wizyty, leady, przypomnienia, opinie).",
+  "cases.pd.more": "Szczegóły: 6 workflow, priorytety i testy",
   "cases.pd.priorities": "Priorytety według efektu biznesowego: najpierw przypomnienia (największe oszczędności), na końcu raportowanie.",
   "cases.pd.tests": "pełny cykl każdego workflow; przypadki brzegowe — brak e-maila, błędny numer telefonu, wydarzenia poza oknem przypomnień, niepełne dane leada; Continue on Fail ze statusem Failed w logach.",
   "cases.pd.resultNote": "szacunek na danych testowych",

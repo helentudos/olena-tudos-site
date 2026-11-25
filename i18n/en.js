@@ -104,6 +104,7 @@ window.I18N.en = {
   "cases.pd.wf4": "Leads: an AI bot in Telegram detects the intent, collects name, phone and service → CRM (Google Sheets) → notification to the administrator.",
   "cases.pd.wf5": "Online booking: Typeform → Google Calendar event → HTML confirmation to the patient → notification to the administrator.",
   "cases.pd.wf6": "Weekly report: every Monday at 9:00, a summary in Telegram (appointments, leads, reminders, reviews).",
+  "cases.pd.more": "More details: 6 workflows, priorities and tests",
   "cases.pd.priorities": "Prioritised by business impact: reminders first (the biggest savings), reporting last.",
   "cases.pd.tests": "full cycle of every workflow; edge cases — no email, invalid phone number, events outside the reminder window, incomplete lead data; Continue on Fail with a Failed status in the logs.",
   "cases.pd.resultNote": "estimate on test data",

@@ -24,7 +24,9 @@ Goal of the page: clients and employers quickly understand how Olena can help, s
 - The site has three languages: **English (en)**, **Polish (pl)**, **Ukrainian (uk)**.
 - **English is the default language.** The page opens in English unless the visitor has chosen another language before; the browser language is not used.
 - The language switcher lists **EN first**, then PL and UA. The chosen language is remembered between visits, and the `lang` attribute on `<html>` is updated.
-- **All texts live in separate translation files** (one per language). HTML contains no text content, only keys (for example `data-i18n="hero.title"`).
+- **All texts live in separate translation files** (one per language), referenced from HTML by keys (for example `data-i18n="hero.title"`).
+- The English text inside `index.html` is **generated** from `i18n/en.js` by `node scripts/prerender.js`, so the page works without JavaScript and search engines see the content. Never edit text in `index.html` by hand: change the translation file and run the script. `node scripts/prerender.js --check` fails if the HTML is out of date.
+- Without JavaScript the page is shown in English; the language and theme switches and the mobile menu button are hidden, and the menu is shown as a plain list.
 - New keys are added to all three files at once. If a translation is not ready yet, the key is marked as such; text is never invented.
 
 ## Stack and layout
@@ -51,7 +53,7 @@ Goal of the page: clients and employers quickly understand how Olena can help, s
 
 - `<title>`, `<meta name="description">` and Open Graph (`og:title`, `og:description`, `og:image`, `og:url`) are written **directly in the HTML**, not via JavaScript, because LinkedIn and Telegram read previews from static HTML only.
 - These tags are in **English**.
-- This is the only exception to the "no text in HTML" rule. Their content also comes from `content/facts.md`.
+- These tags are written by hand (not generated); their content also comes from `content/facts.md`.
 
 ## Inquiry form
 
@@ -80,6 +82,10 @@ Goal of the page: clients and employers quickly understand how Olena can help, s
 
 - **All documentation in the repository is in English**: `README.md`, `CLAUDE.md`, code comments and commit messages.
 - Exception: `content/facts.md` is Olena's source content and stays as she provides it.
+
+## Privacy
+
+- No cookies, no analytics, no third-party requests (fonts are served from the site). The only browser storage is `localStorage` for the visitor's own language and theme choice, so no consent banner is needed. Adding any tracking or third-party embed requires revisiting this.
 
 ## Git
 

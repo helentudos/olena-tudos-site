@@ -25,6 +25,8 @@ window.I18N.pl = {
   "lang.plShort": "PL",
   "lang.enShort": "EN",
 
+  "theme.dark": "Ciemny motyw",
+
   "hero.eyebrow": "AI Automation Specialist · n8n, PostgreSQL, LLM API",
   "hero.title.before": "Zamieniam chaos wiadomości, maili, nagrań głosowych i arkuszy w ",
   "hero.title.em": "uporządkowane dane i działania",

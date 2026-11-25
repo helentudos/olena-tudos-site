@@ -20,6 +20,17 @@
 
   <meta name="theme-color" content="#6D28D9">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <!-- Apply the saved (or system) colour theme before the first paint to avoid a flash -->
+  <script>
+    (function () {
+      var theme = null;
+      try { theme = localStorage.getItem('theme'); } catch (e) {}
+      if (theme !== 'light' && theme !== 'dark') {
+        theme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
   <link rel="stylesheet" href="css/styles.css">
   <script src="js/i18n.js" defer></script>
   <script src="js/main.js" defer></script>
@@ -44,6 +55,10 @@
       </nav>
 
       <div class="header-actions">
+        <button type="button" class="theme-toggle" aria-pressed="false" data-i18n-attr="aria-label:theme.dark|title:theme.dark">
+          <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 14.5A8.5 8.5 0 1 1 9.5 3.5a7 7 0 0 0 11 11z"/></svg>
+          <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg>
+        </button>
         <div class="lang-switch" role="group" data-i18n-attr="aria-label:lang.label">
           <button type="button" data-lang="en" lang="en" data-i18n="lang.enShort" data-i18n-attr="aria-label:lang.en"></button>
           <button type="button" data-lang="pl" lang="pl" data-i18n="lang.plShort" data-i18n-attr="aria-label:lang.pl"></button>

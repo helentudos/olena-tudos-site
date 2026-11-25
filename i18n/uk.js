@@ -25,6 +25,8 @@ window.I18N.uk = {
   "lang.plShort": "PL",
   "lang.enShort": "EN",
 
+  "theme.dark": "Темна тема",
+
   "hero.eyebrow": "AI Automation Specialist · n8n, PostgreSQL, LLM API",
   "hero.title.before": "Перетворюю хаос із повідомлень, листів, голосових і таблиць на ",
   "hero.title.em": "структуровані дані та дії",

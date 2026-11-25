@@ -21,3 +21,13 @@ The page explains what Olena does, shows her case studies and lets visitors send
 
 See [CLAUDE.md](CLAUDE.md). All site content comes from [content/facts.md](content/facts.md).
 Secrets are stored only in Vercel environment variables, never in this repository.
+
+## Run locally
+
+Open `index.html` in a browser. No build step or server is needed.
+
+Check that all translation files have the same, non-empty keys:
+
+```bash
+node scripts/check-i18n.js
+```

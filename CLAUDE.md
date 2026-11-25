@@ -40,6 +40,13 @@ Goal of the page: clients and employers quickly understand how Olena can help, s
   - `label` for form fields; `aria-*` only where HTML semantics are not enough;
   - every animation is disabled by `prefers-reduced-motion`.
 
+## Themes
+
+- The site has a **light and a dark theme** with a toggle in the header.
+- On the first visit the theme follows the visitor's system setting; after that the visitor's choice is remembered.
+- The theme is applied by a small inline script in `<head>` before the first paint, so there is no flash.
+- All colours are CSS variables; every new colour needs a value for both themes, and text must meet WCAG AA contrast in both.
+
 ## SEO and link previews
 
 - `<title>`, `<meta name="description">` and Open Graph (`og:title`, `og:description`, `og:image`, `og:url`) are written **directly in the HTML**, not via JavaScript, because LinkedIn and Telegram read previews from static HTML only.

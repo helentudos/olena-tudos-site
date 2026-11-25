@@ -543,5 +543,5 @@ main:focus { outline: none; }
 
   .case-grid { grid-template-columns: repeat(3, 1fr); gap: 32px; }
   .others-list { grid-template-columns: repeat(3, 1fr); }
-  .contacts { grid-template-columns: repeat(5, 1fr); }
+  .contacts { grid-template-columns: repeat(3, 1fr); }
 }

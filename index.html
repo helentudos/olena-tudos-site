@@ -48,6 +48,8 @@
       .site-nav { display: block; position: static; width: 100%; background: transparent; border: 0; box-shadow: none; }
       .site-nav ul { display: flex; flex-wrap: wrap; gap: 4px 18px; padding: 0; }
       .site-nav a { padding: 4px 0; border: 0; }
+      /* The SVG scene can only be paused by script: without it, hide the scene for reduced motion */
+      @media (prefers-reduced-motion: reduce) { .hero-art { display: none; } }
     </style>
   </noscript>
   <script src="js/i18n.js" defer></script>

@@ -1,2 +1,23 @@
 # olena-tudos-site
-Personal landing page – AI automation specialist (UA / PL / EN), built with Claude Code
+
+Personal landing page of **Olena Tudos**, AI Automation Specialist (n8n, PostgreSQL, LLM APIs).
+Business process automation for small and medium-sized businesses.
+
+The page explains what Olena does, shows her case studies and lets visitors send an inquiry.
+
+## Features
+
+- Three languages: Ukrainian, Polish, English, with a language switcher
+- Single page, mobile-first, accessible (contrast, alt text, keyboard navigation)
+- SEO and link previews (title, description, Open Graph) set directly in HTML
+
+## Tech stack
+
+- Plain HTML, CSS and JavaScript with no frameworks
+- Hosting: Vercel (Hobby plan)
+- Inquiry form (planned): Vercel serverless function
+
+## Project rules
+
+See [CLAUDE.md](CLAUDE.md). All site content comes from [content/facts.md](content/facts.md).
+Secrets are stored only in Vercel environment variables, never in this repository.

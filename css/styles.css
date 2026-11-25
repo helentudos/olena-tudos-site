@@ -264,10 +264,12 @@ main:focus { outline: none; }
   margin-top: 28px;
   color: var(--muted);
   font-weight: 600;
+  font-size: 0.95rem;
 }
+.hero-facts li { white-space: nowrap; }
 .hero-facts li:not(:last-child)::after {
   content: "·";
-  margin: 0 10px;
+  margin: 0 8px;
   color: var(--accent);
 }
 
@@ -519,6 +521,8 @@ main:focus { outline: none; }
 @media (min-width: 600px) {
   .container { padding: 0 32px; }
   .hero-actions { flex-direction: row; flex-wrap: wrap; }
+  .hero-facts { font-size: 1rem; }
+  .hero-facts li:not(:last-child)::after { margin: 0 12px; }
   .cards { grid-template-columns: repeat(2, 1fr); }
   .contacts { grid-template-columns: repeat(2, 1fr); }
   .facts { grid-template-columns: repeat(3, 1fr); }
@@ -605,8 +609,10 @@ main:focus { outline: none; }
   .case-flagship .list-wf li + li { margin-top: 0; }
 }
 
-/* Keep link labels on one line */
-.case-link { white-space: nowrap; flex-shrink: 0; }
+/* Keep link labels on one line where there is room */
+@media (min-width: 600px) {
+  .case-link { white-space: nowrap; flex-shrink: 0; }
+}
 
 /* Narrow phones: icon-only menu button (label stays for screen readers) */
 @media (max-width: 419px) {

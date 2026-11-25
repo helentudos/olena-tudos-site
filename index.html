@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="en" class="js-loading">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- SEO and link previews: static English text by design (see CLAUDE.md) -->
+  <title>Olena Tudos — AI Automation Specialist</title>
+  <meta name="description" content="Automation of internal business processes for small and medium-sized businesses with n8n, PostgreSQL and LLM APIs. I turn messages, emails, voice notes and spreadsheets into structured data and actions for your team.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Olena Tudos — AI Automation Specialist">
+  <meta property="og:description" content="I turn the chaos of messages, emails, voice notes and spreadsheets into structured data and actions for your team. n8n, PostgreSQL, LLM APIs.">
+  <!-- TODO: replace the domain below with the real one after the first Vercel deploy -->
+  <meta property="og:url" content="https://olena-tudos-site.vercel.app/">
+  <meta property="og:image" content="https://olena-tudos-site.vercel.app/assets/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Olena Tudos — AI Automation Specialist">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <meta name="theme-color" content="#6D28D9">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="js/i18n.js" defer></script>
+  <script src="js/main.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main" data-i18n="a11y.skip"></a>
+
+  <!-- 1. Header -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="#top" data-i18n="header.name" data-i18n-attr="aria-label:header.homeLabel"></a>
+
+      <nav class="site-nav" id="site-nav" data-i18n-attr="aria-label:nav.label">
+        <ul>
+          <li><a href="#how" data-i18n="nav.how"></a></li>
+          <li><a href="#services" data-i18n="nav.services"></a></li>
+          <li><a href="#cases" data-i18n="nav.cases"></a></li>
+          <li><a href="#process" data-i18n="nav.process"></a></li>
+          <li><a href="#contact" data-i18n="nav.contact"></a></li>
+        </ul>
+      </nav>
+
+      <div class="header-actions">
+        <div class="lang-switch" role="group" data-i18n-attr="aria-label:lang.label">
+          <button type="button" data-lang="uk" lang="uk" data-i18n="lang.ukShort" data-i18n-attr="aria-label:lang.uk"></button>
+          <button type="button" data-lang="pl" lang="pl" data-i18n="lang.plShort" data-i18n-attr="aria-label:lang.pl"></button>
+          <button type="button" data-lang="en" lang="en" data-i18n="lang.enShort" data-i18n-attr="aria-label:lang.en"></button>
+        </div>
+        <button type="button" class="menu-toggle" aria-expanded="false" aria-controls="site-nav">
+          <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+          <span data-i18n="nav.menu"></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1">
+    <!-- 2. Hero -->
+    <section class="hero" id="top" aria-labelledby="hero-title">
+      <div class="container">
+        <p class="eyebrow" data-i18n="hero.eyebrow"></p>
+        <h1 id="hero-title" data-i18n="hero.title"></h1>
+        <p class="hero-lead" data-i18n="hero.lead"></p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#contact" data-i18n="hero.ctaPrimary"></a>
+          <a class="btn btn-secondary" href="#cases" data-i18n="hero.ctaSecondary"></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. How it works -->
+    <section class="section section-alt" id="how" aria-labelledby="how-title">
+      <div class="container">
+        <h2 id="how-title" data-i18n="how.title"></h2>
+        <p class="section-lead" data-i18n="how.lead"></p>
+        <ol class="flow">
+          <li class="flow-step">
+            <span class="flow-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/><path d="M8.5 11h7M8.5 14h4"/></svg>
+            </span>
+            <h3 data-i18n="how.s1.title"></h3>
+            <p data-i18n="how.s1.text"></p>
+          </li>
+          <li class="flow-step">
+            <span class="flow-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M18.5 15.5l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/></svg>
+            </span>
+            <h3 data-i18n="how.s2.title"></h3>
+            <p data-i18n="how.s2.text"></p>
+          </li>
+          <li class="flow-step">
+            <span class="flow-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5.5" rx="7.5" ry="2.5"/><path d="M4.5 5.5v13c0 1.4 3.4 2.5 7.5 2.5s7.5-1.1 7.5-2.5v-13"/><path d="M4.5 12c0 1.4 3.4 2.5 7.5 2.5s7.5-1.1 7.5-2.5"/></svg>
+            </span>
+            <h3 data-i18n="how.s3.title"></h3>
+            <p data-i18n="how.s3.text"></p>
+          </li>
+          <li class="flow-step">
+            <span class="flow-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="7.5" r="3.5"/><path d="M2.5 20c.6-3.4 2.8-5.5 5.5-5.5s4.9 2.1 5.5 5.5"/><path d="M15.5 20v-4M18.5 20v-7M21.5 20V9"/></svg>
+            </span>
+            <h3 data-i18n="how.s4.title"></h3>
+            <p data-i18n="how.s4.text"></p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- 4. Services -->
+    <section class="section" id="services" aria-labelledby="services-title">
+      <div class="container">
+        <h2 id="services-title" data-i18n="services.title"></h2>
+        <ul class="cards">
+          <li class="card">
+            <span class="card-num" aria-hidden="true">01</span>
+            <h3 data-i18n="services.s1.title"></h3>
+            <p data-i18n="services.s1.text"></p>
+          </li>
+          <li class="card">
+            <span class="card-num" aria-hidden="true">02</span>
+            <h3 data-i18n="services.s2.title"></h3>
+            <p data-i18n="services.s2.text"></p>
+          </li>
+          <li class="card">
+            <span class="card-num" aria-hidden="true">03</span>
+            <h3 data-i18n="services.s3.title"></h3>
+            <p data-i18n="services.s3.text"></p>
+          </li>
+          <li class="card">
+            <span class="card-num" aria-hidden="true">04</span>
+            <h3 data-i18n="services.s4.title"></h3>
+            <p data-i18n="services.s4.text"></p>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 5. Cases -->
+    <section class="section section-alt" id="cases" aria-labelledby="cases-title">
+      <div class="container">
+        <h2 id="cases-title" data-i18n="cases.title"></h2>
+        <p class="section-lead" data-i18n="cases.lead"></p>
+
+        <!-- Case 1: Field Report Voice Bot -->
+        <article class="case" aria-labelledby="case-fr-title">
+          <header class="case-head">
+            <p class="badge" data-i18n="cases.fr.badge"></p>
+            <h3 id="case-fr-title" data-i18n="cases.fr.name"></h3>
+            <p class="case-sub" data-i18n="cases.fr.sub"></p>
+          </header>
+          <div class="case-grid">
+            <div class="case-block">
+              <h4 data-i18n="cases.label.task"></h4>
+              <p data-i18n="cases.fr.task"></p>
+            </div>
+            <div class="case-block">
+              <h4 data-i18n="cases.label.solution"></h4>
+              <p data-i18n="cases.fr.solution"></p>
+            </div>
+            <div class="case-block case-result">
+              <h4><span data-i18n="cases.label.result"></span> <span class="note" data-i18n="cases.fr.resultNote"></span></h4>
+              <p data-i18n="cases.fr.result"></p>
+            </div>
+          </div>
+          <footer class="case-foot">
+            <p class="stack"><span class="stack-label" data-i18n="cases.label.stack"></span> <span data-i18n="cases.fr.stack"></span></p>
+            <a class="case-link" href="https://github.com/helentudos/field-report-voice-bot" target="_blank" rel="noopener noreferrer">
+              <span data-i18n="cases.linkGithub"></span><span class="visually-hidden"> — </span><span class="visually-hidden" data-i18n="cases.fr.name"></span><span class="visually-hidden" data-i18n="a11y.newTab"></span>
+              <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg>
+            </a>
+          </footer>
+        </article>
+
+        <!-- Case 2: Candidate Intake & AI Scoring -->
+        <article class="case" aria-labelledby="case-ci-title">
+          <header class="case-head">
+            <p class="badge" data-i18n="cases.ci.badge"></p>
+            <h3 id="case-ci-title" data-i18n="cases.ci.name"></h3>
+          </header>
+          <div class="case-grid">
+            <div class="case-block">
+              <h4 data-i18n="cases.label.task"></h4>
+              <p data-i18n="cases.ci.task"></p>
+            </div>
+            <div class="case-block">
+              <h4 data-i18n="cases.label.solution"></h4>
+              <p data-i18n="cases.ci.solution"></p>
+            </div>
+            <div class="case-block case-result">
+              <h4><span data-i18n="cases.label.result"></span> <span class="note" data-i18n="cases.ci.resultNote"></span></h4>
+              <p data-i18n="cases.ci.result"></p>
+            </div>
+          </div>
+          <footer class="case-foot">
+            <p class="stack"><span class="stack-label" data-i18n="cases.label.stack"></span> <span data-i18n="cases.ci.stack"></span></p>
+            <a class="case-link" href="https://github.com/helentudos/candidate-intake-ai-scoring" target="_blank" rel="noopener noreferrer">
+              <span data-i18n="cases.linkGithub"></span><span class="visually-hidden"> — </span><span class="visually-hidden" data-i18n="cases.ci.name"></span><span class="visually-hidden" data-i18n="a11y.newTab"></span>
+              <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg>
+            </a>
+          </footer>
+        </article>
+
+        <!-- Case 3: HouseBox -->
+        <article class="case" aria-labelledby="case-hb-title">
+          <header class="case-head">
+            <p class="badge" data-i18n="cases.hb.badge"></p>
+            <h3 id="case-hb-title" data-i18n="cases.hb.name"></h3>
+          </header>
+          <div class="case-grid">
+            <div class="case-block">
+              <h4 data-i18n="cases.label.task"></h4>
+              <p data-i18n="cases.hb.task"></p>
+            </div>
+            <div class="case-block">
+              <h4 data-i18n="cases.label.solution"></h4>
+              <p data-i18n="cases.hb.solution"></p>
+            </div>
+            <div class="case-block case-result">
+              <h4><span data-i18n="cases.label.result"></span> <span class="note" data-i18n="cases.hb.resultNote"></span></h4>
+              <p data-i18n="cases.hb.result"></p>
+            </div>
+          </div>
+          <footer class="case-foot">
+            <p class="stack"><span class="stack-label" data-i18n="cases.label.stack"></span> <span data-i18n="cases.hb.stack"></span></p>
+            <a class="case-link" href="https://sulky-table-323.notion.site/Elena-Tudos-AI-Automation-Specialist-EN-402760dd1d588192866be307375ff0cc" target="_blank" rel="noopener noreferrer">
+              <span data-i18n="cases.linkPortfolio"></span><span class="visually-hidden"> — </span><span class="visually-hidden" data-i18n="cases.hb.name"></span><span class="visually-hidden" data-i18n="a11y.newTab"></span>
+              <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg>
+            </a>
+          </footer>
+        </article>
+
+        <!-- Case 4: PearlDent Clinic (flagship) -->
+        <article class="case case-flagship" aria-labelledby="case-pd-title">
+          <header class="case-head">
+            <p class="badge" data-i18n="cases.pd.badge"></p>
+            <h3 id="case-pd-title" data-i18n="cases.pd.name"></h3>
+            <p class="case-sub" data-i18n="cases.pd.sub"></p>
+          </header>
+          <div class="case-context">
+            <h4 data-i18n="cases.label.context"></h4>
+            <p data-i18n="cases.pd.context"></p>
+          </div>
+          <div class="case-grid">
+            <div class="case-block">
+              <h4 data-i18n="cases.label.task"></h4>
+              <ul class="list">
+                <li data-i18n="cases.pd.p1"></li>
+                <li data-i18n="cases.pd.p2"></li>
+                <li data-i18n="cases.pd.p3"></li>
+                <li data-i18n="cases.pd.p4"></li>
+                <li data-i18n="cases.pd.p5"></li>
+              </ul>
+            </div>
+            <div class="case-block">
+              <h4 data-i18n="cases.label.solution"></h4>
+              <p data-i18n="cases.pd.solution"></p>
+              <ul class="list list-wf">
+                <li data-i18n="cases.pd.wf1"></li>
+                <li data-i18n="cases.pd.wf2"></li>
+                <li data-i18n="cases.pd.wf3"></li>
+                <li data-i18n="cases.pd.wf4"></li>
+                <li data-i18n="cases.pd.wf5"></li>
+                <li data-i18n="cases.pd.wf6"></li>
+              </ul>
+              <p data-i18n="cases.pd.priorities"></p>
+              <p><span class="inline-label" data-i18n="cases.label.tests"></span> <span data-i18n="cases.pd.tests"></span></p>
+            </div>
+            <div class="case-block case-result">
+              <h4><span data-i18n="cases.label.result"></span> <span class="note" data-i18n="cases.pd.resultNote"></span></h4>
+              <ul class="list">
+                <li data-i18n="cases.pd.r1"></li>
+                <li data-i18n="cases.pd.r2"></li>
+                <li data-i18n="cases.pd.r3"></li>
+                <li data-i18n="cases.pd.r4"></li>
+                <li data-i18n="cases.pd.r5"></li>
+              </ul>
+            </div>
+          </div>
+          <footer class="case-foot">
+            <p class="stack"><span class="stack-label" data-i18n="cases.label.stack"></span> <span data-i18n="cases.pd.stack"></span></p>
+            <a class="case-link" href="https://sulky-table-323.notion.site/Elena-Tudos-AI-Automation-Specialist-EN-402760dd1d588192866be307375ff0cc" target="_blank" rel="noopener noreferrer">
+              <span data-i18n="cases.linkNotion"></span><span class="visually-hidden"> — </span><span class="visually-hidden" data-i18n="cases.pd.name"></span><span class="visually-hidden" data-i18n="a11y.newTab"></span>
+              <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg>
+            </a>
+          </footer>
+        </article>
+
+        <!-- Other projects -->
+        <div class="others">
+          <h3 data-i18n="others.title"></h3>
+          <ul class="others-list">
+            <li>
+              <p class="others-name"><span data-i18n="others.st.name"></span></p>
+              <p data-i18n="others.st.text"></p>
+              <p class="stack"><span class="stack-label" data-i18n="cases.label.stack"></span> <span data-i18n="others.st.stack"></span></p>
+            </li>
+            <li>
+              <p class="others-name"><span data-i18n="others.lp.name"></span> <span class="note" data-i18n="others.lp.badge"></span></p>
+              <p data-i18n="others.lp.text"></p>
+              <p class="stack"><span class="stack-label" data-i18n="cases.label.stack"></span> <span data-i18n="others.lp.stack"></span></p>
+            </li>
+            <li>
+              <p class="others-name"><span data-i18n="others.gl.name"></span> <span class="note" data-i18n="others.gl.badge"></span></p>
+              <p data-i18n="others.gl.text"></p>
+              <p class="stack"><span class="stack-label" data-i18n="cases.label.stack"></span> <span data-i18n="others.gl.stack"></span></p>
+            </li>
+          </ul>
+          <a class="case-link" href="https://sulky-table-323.notion.site/Elena-Tudos-AI-Automation-Specialist-EN-402760dd1d588192866be307375ff0cc" target="_blank" rel="noopener noreferrer">
+            <span data-i18n="others.link"></span><span class="visually-hidden" data-i18n="a11y.newTab"></span>
+            <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. How I work -->
+    <section class="section" id="process" aria-labelledby="process-title">
+      <div class="container">
+        <h2 id="process-title" data-i18n="process.title"></h2>
+        <p class="section-lead" data-i18n="process.lead"></p>
+        <ol class="steps">
+          <li data-i18n="process.s1"></li>
+          <li data-i18n="process.s2"></li>
+          <li data-i18n="process.s3"></li>
+          <li data-i18n="process.s4"></li>
+          <li data-i18n="process.s5"></li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- 7. Contacts -->
+    <section class="section section-accent" id="contact" aria-labelledby="contact-title">
+      <div class="container">
+        <h2 id="contact-title" data-i18n="contact.title"></h2>
+        <p class="section-lead" data-i18n="contact.lead"></p>
+        <ul class="contacts">
+          <li>
+            <a href="https://t.me/helena_wro" target="_blank" rel="noopener noreferrer">
+              <span class="contact-label" data-i18n="contact.telegram"></span>
+              <span class="contact-value" data-i18n="contact.telegramValue"></span><span class="visually-hidden" data-i18n="a11y.newTab"></span>
+            </a>
+          </li>
+          <li>
+            <a href="mailto:helena.tudos@gmail.com">
+              <span class="contact-label" data-i18n="contact.email"></span>
+              <span class="contact-value" data-i18n="contact.emailValue"></span>
+            </a>
+          </li>
+          <li>
+            <a href="https://www.linkedin.com/in/olena-tudos" target="_blank" rel="noopener noreferrer">
+              <span class="contact-label" data-i18n="contact.linkedin"></span>
+              <span class="contact-value" data-i18n="contact.linkedinValue"></span><span class="visually-hidden" data-i18n="a11y.newTab"></span>
+            </a>
+          </li>
+          <li>
+            <a href="https://github.com/helentudos" target="_blank" rel="noopener noreferrer">
+              <span class="contact-label" data-i18n="contact.github"></span>
+              <span class="contact-value" data-i18n="contact.githubValue"></span><span class="visually-hidden" data-i18n="a11y.newTab"></span>
+            </a>
+          </li>
+          <li>
+            <a href="https://sulky-table-323.notion.site/Elena-Tudos-AI-Automation-Specialist-EN-402760dd1d588192866be307375ff0cc" target="_blank" rel="noopener noreferrer">
+              <span class="contact-label" data-i18n="contact.notion"></span>
+              <span class="contact-value" data-i18n="contact.notionValue"></span><span class="visually-hidden" data-i18n="a11y.newTab"></span>
+            </a>
+          </li>
+        </ul>
+        <dl class="facts">
+          <div><dt data-i18n="contact.locationLabel"></dt><dd data-i18n="contact.location"></dd></div>
+          <div><dt data-i18n="contact.formatLabel"></dt><dd data-i18n="contact.format"></dd></div>
+          <div><dt data-i18n="contact.languagesLabel"></dt><dd data-i18n="contact.languages"></dd></div>
+        </dl>
+      </div>
+    </section>
+  </main>
+
+  <!-- 8. Footer -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p data-i18n="footer.copy"></p>
+      <a href="#top" data-i18n="footer.top"></a>
+    </div>
+  </footer>
+</body>
+</html>

@@ -216,11 +216,35 @@
 
         <!-- Case 1: Field Report Voice Bot -->
         <article class="case" aria-labelledby="case-fr-title">
-          <header class="case-head">
-            <p class="badge" data-i18n="cases.fr.badge"></p>
-            <h3 id="case-fr-title" data-i18n="cases.fr.name"></h3>
-            <p class="case-sub" data-i18n="cases.fr.sub"></p>
-          </header>
+          <div class="case-top">
+            <header class="case-head">
+              <p class="badge" data-i18n="cases.fr.badge"></p>
+              <h3 id="case-fr-title" data-i18n="cases.fr.name"></h3>
+              <p class="case-sub" data-i18n="cases.fr.sub"></p>
+            </header>
+            <div class="mock mock-fr" aria-hidden="true" data-motion>
+              <p class="mock-tag" data-i18n="mock.tag"></p>
+              <div class="mock-split">
+                <div class="tg">
+                  <p class="tg-head"><span class="tg-ava"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c.8-4 4-6 8-6s7.2 2 8 6"/></svg></span><span data-i18n="cases.fr.name"></span></p>
+                  <div class="tg-msg tg-out">
+                    <span class="tg-play"></span>
+                    <span class="tg-wave"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+                    <span class="tg-cap" data-i18n="mock.fr.voice"></span>
+                  </div>
+                  <p class="tg-msg tg-in"><span class="tg-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><span data-i18n="mock.fr.confirm"></span></p>
+                </div>
+                <div class="mcard">
+                  <p class="mcard-title" data-i18n="mock.fr.pmTitle"></p>
+                  <ul class="mrows">
+                    <li><span data-i18n="mock.fr.row1"></span><i class="sk w70"></i></li>
+                    <li><span data-i18n="mock.fr.row2"></span><i class="sk w50"></i></li>
+                    <li><span data-i18n="mock.fr.row3"></span><span class="chip" data-i18n="mock.fr.toProc"></span></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
           <div class="case-grid">
             <div class="case-block">
               <h4 data-i18n="cases.label.task"></h4>
@@ -246,10 +270,37 @@
 
         <!-- Case 2: Candidate Intake & AI Scoring -->
         <article class="case" aria-labelledby="case-ci-title">
-          <header class="case-head">
-            <p class="badge" data-i18n="cases.ci.badge"></p>
-            <h3 id="case-ci-title" data-i18n="cases.ci.name"></h3>
-          </header>
+          <div class="case-top">
+            <header class="case-head">
+              <p class="badge" data-i18n="cases.ci.badge"></p>
+              <h3 id="case-ci-title" data-i18n="cases.ci.name"></h3>
+            </header>
+            <div class="mock mock-ci" aria-hidden="true">
+              <p class="mock-tag" data-i18n="mock.tag"></p>
+              <div class="mock-split">
+                <div class="mcard cand">
+                  <div class="cand-top">
+                    <span class="cand-ava"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c.8-4 4-6 8-6s7.2 2 8 6"/></svg></span>
+                    <div class="cand-id"><p class="cand-name" data-i18n="mock.ci.name"></p><i class="sk w60"></i></div>
+                    <div class="score" style="--v: 95"><span class="score-num" data-i18n="mock.ci.score"></span><span class="score-of" data-i18n="mock.ci.scoreLabel"></span></div>
+                  </div>
+                  <p class="mlabel" data-i18n="mock.ci.extracted"></p>
+                  <ul class="chips">
+                    <li data-i18n="mock.ci.f1"></li>
+                    <li data-i18n="mock.ci.f2"></li>
+                    <li data-i18n="mock.ci.f3"></li>
+                    <li data-i18n="mock.ci.f4"></li>
+                  </ul>
+                  <p class="mlabel" data-i18n="mock.ci.reasons"></p>
+                  <i class="sk w90"></i><i class="sk w70"></i>
+                </div>
+                <div class="mcard bars-card">
+                  <p class="mlabel" data-i18n="mock.ci.chart"></p>
+                  <div class="bars"><i style="--h: 95"></i><i style="--h: 85"></i><i style="--h: 80"></i><i style="--h: 70"></i><i style="--h: 0"></i></div>
+                </div>
+              </div>
+            </div>
+          </div>
           <div class="case-grid">
             <div class="case-block">
               <h4 data-i18n="cases.label.task"></h4>
@@ -275,10 +326,27 @@
 
         <!-- Case 3: HouseBox -->
         <article class="case" aria-labelledby="case-hb-title">
-          <header class="case-head">
-            <p class="badge" data-i18n="cases.hb.badge"></p>
-            <h3 id="case-hb-title" data-i18n="cases.hb.name"></h3>
-          </header>
+          <div class="case-top">
+            <header class="case-head">
+              <p class="badge" data-i18n="cases.hb.badge"></p>
+              <h3 id="case-hb-title" data-i18n="cases.hb.name"></h3>
+            </header>
+            <div class="mock mock-hb" aria-hidden="true" data-motion>
+              <p class="mock-tag" data-i18n="mock.tag"></p>
+              <div class="mcard">
+                <p class="mcard-title" data-i18n="mock.hb.title"></p>
+                <ul class="tickets">
+                  <li class="t-p1"><span class="prio" data-i18n="mock.hb.p1"></span><i class="sk w60"></i><span class="sla"><span data-i18n="mock.hb.sla"></span><span class="sla-bar"><i></i></span></span></li>
+                  <li class="t-p2"><span class="prio" data-i18n="mock.hb.p2"></span><i class="sk w70"></i></li>
+                  <li class="t-p3"><span class="prio" data-i18n="mock.hb.p3"></span><i class="sk w50"></i></li>
+                </ul>
+              </div>
+              <div class="mock-row">
+                <p class="mnotify"><span class="mnotify-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9z"/><path d="M10 20a2.2 2.2 0 0 0 4 0"/></svg></span><span data-i18n="mock.hb.slack"></span></p>
+                <p class="levels"><i class="on"></i><i class="on"></i><i></i><span data-i18n="mock.hb.levels"></span></p>
+              </div>
+            </div>
+          </div>
           <div class="case-grid">
             <div class="case-block">
               <h4 data-i18n="cases.label.task"></h4>
@@ -304,11 +372,38 @@
 
         <!-- Case 4: PearlDent Clinic (flagship) -->
         <article class="case case-flagship" aria-labelledby="case-pd-title">
-          <header class="case-head">
-            <p class="badge" data-i18n="cases.pd.badge"></p>
-            <h3 id="case-pd-title" data-i18n="cases.pd.name"></h3>
-            <p class="case-sub" data-i18n="cases.pd.sub"></p>
-          </header>
+          <div class="case-top">
+            <header class="case-head">
+              <p class="badge" data-i18n="cases.pd.badge"></p>
+              <h3 id="case-pd-title" data-i18n="cases.pd.name"></h3>
+              <p class="case-sub" data-i18n="cases.pd.sub"></p>
+            </header>
+            <div class="mock mock-pd" aria-hidden="true" data-motion>
+              <p class="mock-tag" data-i18n="mock.tag"></p>
+              <div class="mock-split">
+                <div class="mcard cal">
+                  <p class="mcard-title" data-i18n="mock.pd.calTitle"></p>
+                  <div class="cal-grid">
+                    <div><span data-i18n="mock.pd.d1"></span><i></i><i></i><i></i></div>
+                    <div><span data-i18n="mock.pd.d2"></span><i></i><i class="slot-hl"></i><i></i></div>
+                    <div><span data-i18n="mock.pd.d3"></span><i></i><i></i></div>
+                    <div><span data-i18n="mock.pd.d4"></span><i></i><i></i><i></i></div>
+                    <div><span data-i18n="mock.pd.d5"></span><i></i><i></i></div>
+                  </div>
+                  <p class="cal-reminder"><span class="mnotify-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9z"/><path d="M10 20a2.2 2.2 0 0 0 4 0"/></svg></span><span data-i18n="mock.pd.reminder"></span></p>
+                </div>
+                <div class="mcard">
+                  <p class="mcard-title" data-i18n="mock.pd.reportTitle"></p>
+                  <ul class="mrows">
+                    <li><span data-i18n="mock.pd.k1"></span><i class="sk w60"></i></li>
+                    <li><span data-i18n="mock.pd.k2"></span><i class="sk w40"></i></li>
+                    <li><span data-i18n="mock.pd.k3"></span><i class="sk w70"></i></li>
+                    <li><span data-i18n="mock.pd.k4"></span><i class="sk w50"></i></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
           <div class="case-context">
             <h4 data-i18n="cases.label.context"></h4>
             <p data-i18n="cases.pd.context"></p>

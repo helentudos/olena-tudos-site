@@ -256,6 +256,21 @@ main:focus { outline: none; }
   gap: 12px;
 }
 
+.hero-facts {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 0;
+  margin-top: 28px;
+  color: var(--muted);
+  font-weight: 600;
+}
+.hero-facts li:not(:last-child)::after {
+  content: "·";
+  margin: 0 10px;
+  color: var(--accent);
+}
+
 /* ---------- How it works (flow) ---------- */
 .flow {
   list-style: none;

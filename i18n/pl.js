@@ -30,6 +30,9 @@ window.I18N.pl = {
   "hero.lead": "Automatyzacja wewnętrznych procesów biznesowych dla małych i średnich firm.",
   "hero.ctaPrimary": "Omówmy zadanie",
   "hero.ctaSecondary": "Zobacz projekty",
+  "hero.fact1": "30+ automatyzacji",
+  "hero.fact2": "7 projektów",
+  "hero.fact3": "3 języki",
 
   "how.title": "Jak to działa",
   "how.lead": "Jeden schemat, na którym opierają się moje automatyzacje.",

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" class="js-loading">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -29,44 +29,60 @@
         theme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
       }
       document.documentElement.setAttribute('data-theme', theme);
+
+      // The HTML already contains English text. Hide it only for visitors who chose
+      // another language, until that language is applied (avoids a flash of English).
+      var lang = null;
+      try { lang = localStorage.getItem('lang'); } catch (e) {}
+      if (lang === 'pl' || lang === 'uk') document.documentElement.classList.add('js-loading');
     })();
   </script>
   <link rel="stylesheet" href="css/styles.css">
+  <noscript>
+    <style>
+      /* Without JavaScript: English only, no language/theme switch, menu shown as a plain list */
+      .lang-switch, .theme-toggle, .menu-toggle { display: none !important; }
+      .header-inner { flex-wrap: wrap; padding-block: 10px; }
+      .site-nav { display: block; position: static; width: 100%; background: transparent; border: 0; box-shadow: none; }
+      .site-nav ul { display: flex; flex-wrap: wrap; gap: 4px 18px; padding: 0; }
+      .site-nav a { padding: 4px 0; border: 0; }
+    </style>
+  </noscript>
   <script src="js/i18n.js" defer></script>
   <script src="js/main.js" defer></script>
   <script src="js/motion.js" defer></script>
 </head>
 <body>
-  <a class="skip-link" href="#main" data-i18n="a11y.skip"></a>
+  <a class="skip-link" href="#main" data-i18n="a11y.skip">Skip to content</a>
 
   <!-- 1. Header -->
   <header class="site-header">
     <div class="container header-inner">
-      <a class="brand" href="#top" data-i18n="header.name" data-i18n-attr="aria-label:header.homeLabel"></a>
+      <a class="brand" href="#top" data-i18n="header.name" aria-label="Olena Tudos — back to top" data-i18n-attr="aria-label:header.homeLabel">Olena Tudos</a>
 
-      <nav class="site-nav" id="site-nav" data-i18n-attr="aria-label:nav.label">
+      <nav class="site-nav" id="site-nav" aria-label="Page sections" data-i18n-attr="aria-label:nav.label">
         <ul>
-          <li><a href="#how" data-i18n="nav.how"></a></li>
-          <li><a href="#services" data-i18n="nav.services"></a></li>
-          <li><a href="#cases" data-i18n="nav.cases"></a></li>
-          <li><a href="#process" data-i18n="nav.process"></a></li>
-          <li><a href="#contact" data-i18n="nav.contact"></a></li>
+          <li><a href="#how" data-i18n="nav.how">How it works</a></li>
+          <li><a href="#services" data-i18n="nav.services">Services</a></li>
+          <li><a href="#cases" data-i18n="nav.cases">Case studies</a></li>
+          <li><a href="#process" data-i18n="nav.process">How I work</a></li>
+          <li><a href="#contact" data-i18n="nav.contact">Contact</a></li>
         </ul>
       </nav>
 
       <div class="header-actions">
-        <button type="button" class="theme-toggle" aria-pressed="false" data-i18n-attr="aria-label:theme.dark|title:theme.dark">
+        <button type="button" class="theme-toggle" aria-pressed="false" aria-label="Dark theme" title="Dark theme" data-i18n-attr="aria-label:theme.dark|title:theme.dark">
           <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 14.5A8.5 8.5 0 1 1 9.5 3.5a7 7 0 0 0 11 11z"/></svg>
           <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg>
         </button>
-        <div class="lang-switch" role="group" data-i18n-attr="aria-label:lang.label">
-          <button type="button" data-lang="en" lang="en"><span data-i18n="lang.enShort"></span> <span class="visually-hidden" data-i18n="lang.en"></span></button>
-          <button type="button" data-lang="pl" lang="pl"><span data-i18n="lang.plShort"></span> <span class="visually-hidden" data-i18n="lang.pl"></span></button>
-          <button type="button" data-lang="uk" lang="uk"><span data-i18n="lang.ukShort"></span> <span class="visually-hidden" data-i18n="lang.uk"></span></button>
+        <div class="lang-switch" role="group" aria-label="Site language" data-i18n-attr="aria-label:lang.label">
+          <button type="button" data-lang="en" lang="en"><span data-i18n="lang.enShort">EN</span> <span class="visually-hidden" data-i18n="lang.en">English</span></button>
+          <button type="button" data-lang="pl" lang="pl"><span data-i18n="lang.plShort">PL</span> <span class="visually-hidden" data-i18n="lang.pl">Polski</span></button>
+          <button type="button" data-lang="uk" lang="uk"><span data-i18n="lang.ukShort">UA</span> <span class="visually-hidden" data-i18n="lang.uk">Українська</span></button>
         </div>
         <button type="button" class="menu-toggle" aria-expanded="false" aria-controls="site-nav">
           <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
-          <span data-i18n="nav.menu"></span>
+          <span data-i18n="nav.menu">Menu</span>
         </button>
       </div>
     </div>
@@ -77,17 +93,17 @@
     <section class="hero" id="top" aria-labelledby="hero-title">
       <div class="container hero-inner">
         <div class="hero-text">
-          <p class="eyebrow" data-i18n="hero.eyebrow"></p>
-          <h1 id="hero-title"><span data-i18n="hero.title.before"></span><em class="hl" data-i18n="hero.title.em"></em><span data-i18n="hero.title.after"></span></h1>
-          <p class="hero-lead" data-i18n="hero.lead"></p>
+          <p class="eyebrow" data-i18n="hero.eyebrow">AI Automation Specialist · n8n, PostgreSQL, LLM APIs</p>
+          <h1 id="hero-title"><span data-i18n="hero.title.before">I turn the chaos of messages, emails, voice notes and spreadsheets into </span><em class="hl" data-i18n="hero.title.em">structured data and actions</em><span data-i18n="hero.title.after"> for your team.</span></h1>
+          <p class="hero-lead" data-i18n="hero.lead">Automation of internal business processes for small and medium-sized businesses.</p>
           <div class="hero-actions">
-            <a class="btn btn-primary" href="#contact" data-i18n="hero.ctaPrimary"></a>
-            <a class="btn btn-secondary" href="#cases" data-i18n="hero.ctaSecondary"></a>
+            <a class="btn btn-primary" href="#contact" data-i18n="hero.ctaPrimary">Discuss your task</a>
+            <a class="btn btn-secondary" href="#cases" data-i18n="hero.ctaSecondary">View case studies</a>
           </div>
           <ul class="hero-facts">
-            <li><span class="fact-num" data-i18n="hero.fact1.num"></span> <span class="fact-label" data-i18n="hero.fact1.label"></span></li>
-            <li><span class="fact-num" data-i18n="hero.fact2.num"></span> <span class="fact-label" data-i18n="hero.fact2.label"></span></li>
-            <li><span class="fact-num" data-i18n="hero.fact3.num"></span> <span class="fact-label" data-i18n="hero.fact3.label"></span></li>
+            <li><span class="fact-num" data-i18n="hero.fact1.num">30+</span> <span class="fact-label" data-i18n="hero.fact1.label">automations</span></li>
+            <li><span class="fact-num" data-i18n="hero.fact2.num">7</span> <span class="fact-label" data-i18n="hero.fact2.label">projects</span></li>
+            <li><span class="fact-num" data-i18n="hero.fact3.num">4</span> <span class="fact-label" data-i18n="hero.fact3.label">languages</span></li>
           </ul>
         </div>
 
@@ -159,36 +175,36 @@
     <!-- 3. How it works -->
     <section class="section section-dark" id="how" aria-labelledby="how-title">
       <div class="container">
-        <h2 id="how-title" data-i18n="how.title"></h2>
-        <p class="section-lead" data-i18n="how.lead"></p>
+        <h2 id="how-title" data-i18n="how.title">How it works</h2>
+        <p class="section-lead" data-i18n="how.lead">One pattern behind my automations.</p>
         <ol class="flow" data-motion>
           <li class="flow-step">
             <span class="flow-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/><path d="M8.5 11h7M8.5 14h4"/></svg>
             </span>
-            <h3 data-i18n="how.s1.title"></h3>
-            <p data-i18n="how.s1.text"></p>
+            <h3 data-i18n="how.s1.title">Incoming information</h3>
+            <p data-i18n="how.s1.text">Text, voice, email or a form.</p>
           </li>
           <li class="flow-step">
             <span class="flow-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M18.5 15.5l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/></svg>
             </span>
-            <h3 data-i18n="how.s2.title"></h3>
-            <p data-i18n="how.s2.text"></p>
+            <h3 data-i18n="how.s2.title">AI structures it</h3>
+            <p data-i18n="how.s2.text">Detects the type and priority, extracts the data you need.</p>
           </li>
           <li class="flow-step">
             <span class="flow-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5.5" rx="7.5" ry="2.5"/><path d="M4.5 5.5v13c0 1.4 3.4 2.5 7.5 2.5s7.5-1.1 7.5-2.5v-13"/><path d="M4.5 12c0 1.4 3.4 2.5 7.5 2.5s7.5-1.1 7.5-2.5"/></svg>
             </span>
-            <h3 data-i18n="how.s3.title"></h3>
-            <p data-i18n="how.s3.text"></p>
+            <h3 data-i18n="how.s3.title">Database or CRM</h3>
+            <p data-i18n="how.s3.text">Structured data is stored in a database or CRM.</p>
           </li>
           <li class="flow-step">
             <span class="flow-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="7.5" r="3.5"/><path d="M2.5 20c.6-3.4 2.8-5.5 5.5-5.5s4.9 2.1 5.5 5.5"/><path d="M15.5 20v-4M18.5 20v-7M21.5 20V9"/></svg>
             </span>
-            <h3 data-i18n="how.s4.title"></h3>
-            <p data-i18n="how.s4.text"></p>
+            <h3 data-i18n="how.s4.title">Action and report</h3>
+            <p data-i18n="how.s4.text">The right person gets an action, the manager gets a report.</p>
           </li>
         </ol>
       </div>
@@ -197,27 +213,27 @@
     <!-- 4. Services -->
     <section class="section" id="services" aria-labelledby="services-title">
       <div class="container">
-        <h2 id="services-title" data-i18n="services.title"></h2>
+        <h2 id="services-title" data-i18n="services.title">Services</h2>
         <ul class="cards">
           <li class="card">
             <span class="card-num" aria-hidden="true">01</span>
-            <h3 data-i18n="services.s1.title"></h3>
-            <p data-i18n="services.s1.text"></p>
+            <h3 data-i18n="services.s1.title">Incoming requests → structure and routing</h3>
+            <p data-i18n="services.s1.text">Form, email, messenger → AI detects the type, priority and data → CRM or database → the responsible person gets a task.</p>
           </li>
           <li class="card">
             <span class="card-num" aria-hidden="true">02</span>
-            <h3 data-i18n="services.s2.title"></h3>
-            <p data-i18n="services.s2.text"></p>
+            <h3 data-i18n="services.s2.title">Voice and documents → data</h3>
+            <p data-i18n="services.s2.text">Voice reports, emails, documents → AI extracts what matters → spreadsheet, database or ERP; anything uncertain goes to a person for review.</p>
           </li>
           <li class="card">
             <span class="card-num" aria-hidden="true">03</span>
-            <h3 data-i18n="services.s3.title"></h3>
-            <p data-i18n="services.s3.text"></p>
+            <h3 data-i18n="services.s3.title">Internal team requests</h3>
+            <p data-i18n="services.s3.text">Employee requests (IT, HR, procurement) → category, priority, owner, deadline tracking.</p>
           </li>
           <li class="card">
             <span class="card-num" aria-hidden="true">04</span>
-            <h3 data-i18n="services.s4.title"></h3>
-            <p data-i18n="services.s4.text"></p>
+            <h3 data-i18n="services.s4.title">Reports for managers</h3>
+            <p data-i18n="services.s4.text">Daily or weekly metrics from a database or spreadsheets → a short summary in Telegram or by email.</p>
           </li>
         </ul>
       </div>
@@ -226,35 +242,35 @@
     <!-- 5. Cases -->
     <section class="section section-alt" id="cases" aria-labelledby="cases-title">
       <div class="container">
-        <h2 id="cases-title" data-i18n="cases.title"></h2>
-        <p class="section-lead" data-i18n="cases.lead"></p>
+        <h2 id="cases-title" data-i18n="cases.title">Case studies</h2>
+        <p class="section-lead" data-i18n="cases.lead">Figures in the case studies come from tests and estimates on test data. Each project's status is shown next to its name.</p>
 
         <!-- Case 1: Field Report Voice Bot -->
         <article class="case" aria-labelledby="case-fr-title">
           <div class="case-top">
             <header class="case-head">
-              <p class="badge" data-i18n="cases.fr.badge"></p>
-              <h3 id="case-fr-title" data-i18n="cases.fr.name"></h3>
-              <p class="case-sub" data-i18n="cases.fr.sub"></p>
+              <p class="badge" data-i18n="cases.fr.badge">Test assignment · 11/2026</p>
+              <h3 id="case-fr-title" data-i18n="cases.fr.name">Field Report Voice Bot</h3>
+              <p class="case-sub" data-i18n="cases.fr.sub">Smart home installation company</p>
             </header>
             <div class="mock mock-fr" aria-hidden="true" data-motion>
-              <p class="mock-tag" data-i18n="mock.tag"></p>
+              <p class="mock-tag" data-i18n="mock.tag">Mock-up · test data</p>
               <div class="mock-split">
                 <div class="tg">
-                  <p class="tg-head"><span class="tg-ava"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c.8-4 4-6 8-6s7.2 2 8 6"/></svg></span><span data-i18n="cases.fr.name"></span></p>
+                  <p class="tg-head"><span class="tg-ava"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c.8-4 4-6 8-6s7.2 2 8 6"/></svg></span><span data-i18n="cases.fr.name">Field Report Voice Bot</span></p>
                   <div class="tg-msg tg-out">
                     <span class="tg-play"></span>
                     <span class="tg-wave"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
-                    <span class="tg-cap" data-i18n="mock.fr.voice"></span>
+                    <span class="tg-cap" data-i18n="mock.fr.voice">Voice message from the installer</span>
                   </div>
-                  <p class="tg-msg tg-in"><span class="tg-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><span data-i18n="mock.fr.confirm"></span></p>
+                  <p class="tg-msg tg-in"><span class="tg-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><span data-i18n="mock.fr.confirm">Stage report saved, site passport updated.</span></p>
                 </div>
                 <div class="mcard">
-                  <p class="mcard-title" data-i18n="mock.fr.pmTitle"></p>
+                  <p class="mcard-title" data-i18n="mock.fr.pmTitle">Stage report for the PM</p>
                   <ul class="mrows">
-                    <li><span data-i18n="mock.fr.row1"></span><i class="sk w70"></i></li>
-                    <li><span data-i18n="mock.fr.row2"></span><i class="sk w50"></i></li>
-                    <li><span data-i18n="mock.fr.row3"></span><span class="chip" data-i18n="mock.fr.toProc"></span></li>
+                    <li><span data-i18n="mock.fr.row1">Stage</span><i class="sk w70"></i></li>
+                    <li><span data-i18n="mock.fr.row2">Done</span><i class="sk w50"></i></li>
+                    <li><span data-i18n="mock.fr.row3">Missing materials</span><span class="chip" data-i18n="mock.fr.toProc">→ to procurement</span></li>
                   </ul>
                 </div>
               </div>
@@ -262,22 +278,22 @@
           </div>
           <div class="case-grid">
             <div class="case-block">
-              <h4 data-i18n="cases.label.task"></h4>
-              <p data-i18n="cases.fr.task"></p>
+              <h4 data-i18n="cases.label.task">Task</h4>
+              <p data-i18n="cases.fr.task">Analyse the processes of 10 departments and turn installers' voice reports from job sites into information for the people who need it.</p>
             </div>
             <div class="case-block">
-              <h4 data-i18n="cases.label.solution"></h4>
-              <p data-i18n="cases.fr.solution"></p>
+              <h4 data-i18n="cases.label.solution">Solution</h4>
+              <p data-i18n="cases.fr.solution">The installer sends a voice message in Telegram → transcription → AI stage report → site passport. The PM gets the full report, procurement gets only missing materials, the installer gets a confirmation.</p>
             </div>
             <div class="case-block case-result">
-              <h4><span data-i18n="cases.label.result"></span> <span class="note" data-i18n="cases.fr.resultNote"></span></h4>
-              <p data-i18n="cases.fr.result"></p>
+              <h4><span data-i18n="cases.label.result">Result</span> <span class="note" data-i18n="cases.fr.resultNote">test assignment</span></h4>
+              <p data-i18n="cases.fr.result">17 tests; OpenAI vs Deepgram compared on 5 recordings; target architecture with Odoo.</p>
             </div>
           </div>
           <footer class="case-foot">
-            <p class="stack"><span class="stack-label" data-i18n="cases.label.stack"></span> <span data-i18n="cases.fr.stack"></span></p>
+            <p class="stack"><span class="stack-label" data-i18n="cases.label.stack">Stack:</span> <span data-i18n="cases.fr.stack">Telegram, OpenAI, Deepgram; target architecture with Odoo</span></p>
             <a class="case-link" href="https://github.com/helentudos/field-report-voice-bot" target="_blank" rel="noopener noreferrer">
-              <span data-i18n="cases.linkGithub"></span><span class="visually-hidden"> — </span><span class="visually-hidden" data-i18n="cases.fr.name"></span><span class="visually-hidden" data-i18n="a11y.newTab"></span>
+              <span data-i18n="cases.linkGithub">Code on GitHub</span><span class="visually-hidden"> — </span><span class="visually-hidden" data-i18n="cases.fr.name">Field Report Voice Bot</span><span class="visually-hidden" data-i18n="a11y.newTab"> (opens in a new tab)</span>
               <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg>
             </a>
           </footer>
@@ -287,30 +303,30 @@
         <article class="case" aria-labelledby="case-ci-title">
           <div class="case-top">
             <header class="case-head">
-              <p class="badge" data-i18n="cases.ci.badge"></p>
-              <h3 id="case-ci-title" data-i18n="cases.ci.name"></h3>
+              <p class="badge" data-i18n="cases.ci.badge">Recruitment demo · 11/2026</p>
+              <h3 id="case-ci-title" data-i18n="cases.ci.name">Candidate Intake &amp; AI Scoring</h3>
             </header>
             <div class="mock mock-ci" aria-hidden="true">
-              <p class="mock-tag" data-i18n="mock.tag"></p>
+              <p class="mock-tag" data-i18n="mock.tag">Mock-up · test data</p>
               <div class="mock-split">
                 <div class="mcard cand">
                   <div class="cand-top">
                     <span class="cand-ava"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c.8-4 4-6 8-6s7.2 2 8 6"/></svg></span>
-                    <div class="cand-id"><p class="cand-name" data-i18n="mock.ci.name"></p><i class="sk w60"></i></div>
-                    <div class="score" style="--v: 95"><span class="score-num" data-i18n="mock.ci.score"></span><span class="score-of" data-i18n="mock.ci.scoreLabel"></span></div>
+                    <div class="cand-id"><p class="cand-name" data-i18n="mock.ci.name">Test candidate</p><i class="sk w60"></i></div>
+                    <div class="score" style="--v: 95"><span class="score-num" data-i18n="mock.ci.score">95</span><span class="score-of" data-i18n="mock.ci.scoreLabel">out of 100</span></div>
                   </div>
-                  <p class="mlabel" data-i18n="mock.ci.extracted"></p>
+                  <p class="mlabel" data-i18n="mock.ci.extracted">LLM → JSON</p>
                   <ul class="chips">
-                    <li data-i18n="mock.ci.f1"></li>
-                    <li data-i18n="mock.ci.f2"></li>
-                    <li data-i18n="mock.ci.f3"></li>
-                    <li data-i18n="mock.ci.f4"></li>
+                    <li data-i18n="mock.ci.f1">Skills</li>
+                    <li data-i18n="mock.ci.f2">Experience</li>
+                    <li data-i18n="mock.ci.f3">Languages</li>
+                    <li data-i18n="mock.ci.f4">Salary</li>
                   </ul>
-                  <p class="mlabel" data-i18n="mock.ci.reasons"></p>
+                  <p class="mlabel" data-i18n="mock.ci.reasons">Reasons for the score (rubric)</p>
                   <i class="sk w90"></i><i class="sk w70"></i>
                 </div>
                 <div class="mcard bars-card">
-                  <p class="mlabel" data-i18n="mock.ci.chart"></p>
+                  <p class="mlabel" data-i18n="mock.ci.chart">Scores of 5 test candidates</p>
                   <div class="bars"><i style="--h: 95"></i><i style="--h: 85"></i><i style="--h: 80"></i><i style="--h: 70"></i><i style="--h: 0"></i></div>
                 </div>
               </div>
@@ -318,22 +334,22 @@
           </div>
           <div class="case-grid">
             <div class="case-block">
-              <h4 data-i18n="cases.label.task"></h4>
-              <p data-i18n="cases.ci.task"></p>
+              <h4 data-i18n="cases.label.task">Task</h4>
+              <p data-i18n="cases.ci.task">Process candidates' CVs automatically and notify the recruiter only about strong ones.</p>
             </div>
             <div class="case-block">
-              <h4 data-i18n="cases.label.solution"></h4>
-              <p data-i18n="cases.ci.solution"></p>
+              <h4 data-i18n="cases.label.solution">Solution</h4>
+              <p data-i18n="cases.ci.solution">CV form → LLM extracts skills, experience, languages and salary into JSON → PostgreSQL without duplicates → AI score 0–100 against a rubric, with reasons → Telegram message to the recruiter only for strong candidates. Separate Error Handler.</p>
             </div>
             <div class="case-block case-result">
-              <h4><span data-i18n="cases.label.result"></span> <span class="note" data-i18n="cases.ci.resultNote"></span></h4>
-              <p data-i18n="cases.ci.result"></p>
+              <h4><span data-i18n="cases.label.result">Result</span> <span class="note" data-i18n="cases.ci.resultNote">demo, test data</span></h4>
+              <p data-i18n="cases.ci.result">16 tests, 6 issues found and fixed; test candidates scored 95 / 85 / 80 / 70 / 0 in a logical order.</p>
             </div>
           </div>
           <footer class="case-foot">
-            <p class="stack"><span class="stack-label" data-i18n="cases.label.stack"></span> <span data-i18n="cases.ci.stack"></span></p>
+            <p class="stack"><span class="stack-label" data-i18n="cases.label.stack">Stack:</span> <span data-i18n="cases.ci.stack">n8n, PostgreSQL (Neon), gpt-4.1-mini, JavaScript, Telegram</span></p>
             <a class="case-link" href="https://github.com/helentudos/candidate-intake-ai-scoring" target="_blank" rel="noopener noreferrer">
-              <span data-i18n="cases.linkGithub"></span><span class="visually-hidden"> — </span><span class="visually-hidden" data-i18n="cases.ci.name"></span><span class="visually-hidden" data-i18n="a11y.newTab"></span>
+              <span data-i18n="cases.linkGithub">Code on GitHub</span><span class="visually-hidden"> — </span><span class="visually-hidden" data-i18n="cases.ci.name">Candidate Intake &amp; AI Scoring</span><span class="visually-hidden" data-i18n="a11y.newTab"> (opens in a new tab)</span>
               <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg>
             </a>
           </footer>
@@ -343,43 +359,43 @@
         <article class="case" aria-labelledby="case-hb-title">
           <div class="case-top">
             <header class="case-head">
-              <p class="badge" data-i18n="cases.hb.badge"></p>
-              <h3 id="case-hb-title" data-i18n="cases.hb.name"></h3>
+              <p class="badge" data-i18n="cases.hb.badge">Training project</p>
+              <h3 id="case-hb-title" data-i18n="cases.hb.name">HouseBox — AI Ticket Routing + SLA</h3>
             </header>
             <div class="mock mock-hb" aria-hidden="true" data-motion>
-              <p class="mock-tag" data-i18n="mock.tag"></p>
+              <p class="mock-tag" data-i18n="mock.tag">Mock-up · test data</p>
               <div class="mcard">
-                <p class="mcard-title" data-i18n="mock.hb.title"></p>
+                <p class="mcard-title" data-i18n="mock.hb.title">Requests from Gmail</p>
                 <ul class="tickets">
-                  <li class="t-p1"><span class="prio" data-i18n="mock.hb.p1"></span><i class="sk w60"></i><span class="sla"><span data-i18n="mock.hb.sla"></span><span class="sla-bar"><i></i></span></span></li>
-                  <li class="t-p2"><span class="prio" data-i18n="mock.hb.p2"></span><i class="sk w70"></i></li>
-                  <li class="t-p3"><span class="prio" data-i18n="mock.hb.p3"></span><i class="sk w50"></i></li>
+                  <li class="t-p1"><span class="prio" data-i18n="mock.hb.p1">P1</span><i class="sk w60"></i><span class="sla"><span data-i18n="mock.hb.sla">SLA ~15 min</span><span class="sla-bar"><i></i></span></span></li>
+                  <li class="t-p2"><span class="prio" data-i18n="mock.hb.p2">P2</span><i class="sk w70"></i></li>
+                  <li class="t-p3"><span class="prio" data-i18n="mock.hb.p3">P3</span><i class="sk w50"></i></li>
                 </ul>
               </div>
               <div class="mock-row">
-                <p class="mnotify"><span class="mnotify-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9z"/><path d="M10 20a2.2 2.2 0 0 0 4 0"/></svg></span><span data-i18n="mock.hb.slack"></span></p>
-                <p class="levels"><i class="on"></i><i class="on"></i><i></i><span data-i18n="mock.hb.levels"></span></p>
+                <p class="mnotify"><span class="mnotify-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9z"/><path d="M10 20a2.2 2.2 0 0 0 4 0"/></svg></span><span data-i18n="mock.hb.slack">Slack: urgent P1 request</span></p>
+                <p class="levels"><i class="on"></i><i class="on"></i><i></i><span data-i18n="mock.hb.levels">3 escalation levels</span></p>
               </div>
             </div>
           </div>
           <div class="case-grid">
             <div class="case-block">
-              <h4 data-i18n="cases.label.task"></h4>
-              <p data-i18n="cases.hb.task"></p>
+              <h4 data-i18n="cases.label.task">Task</h4>
+              <p data-i18n="cases.hb.task">Sort support requests from Gmail by topic and urgency and keep response times under control (SLA).</p>
             </div>
             <div class="case-block">
-              <h4 data-i18n="cases.label.solution"></h4>
-              <p data-i18n="cases.hb.solution"></p>
+              <h4 data-i18n="cases.label.solution">Solution</h4>
+              <p data-i18n="cases.hb.solution">AI classification of requests by topic and urgency (chain-of-thought), 3 escalation levels, SLA tracking, Slack notifications.</p>
             </div>
             <div class="case-block case-result">
-              <h4><span data-i18n="cases.label.result"></span> <span class="note" data-i18n="cases.hb.resultNote"></span></h4>
-              <p data-i18n="cases.hb.result"></p>
+              <h4><span data-i18n="cases.label.result">Result</span> <span class="note" data-i18n="cases.hb.resultNote">training project, simulated</span></h4>
+              <p data-i18n="cases.hb.result">First response to urgent requests (P1): 11 h → ~15 min.</p>
             </div>
           </div>
           <footer class="case-foot">
-            <p class="stack"><span class="stack-label" data-i18n="cases.label.stack"></span> <span data-i18n="cases.hb.stack"></span></p>
+            <p class="stack"><span class="stack-label" data-i18n="cases.label.stack">Stack:</span> <span data-i18n="cases.hb.stack">Gmail, GPT-4o-mini, Google Sheets, Slack</span></p>
             <a class="case-link" href="https://sulky-table-323.notion.site/e83760dd1d588257869c812a04695a22" target="_blank" rel="noopener noreferrer">
-              <span data-i18n="cases.linkNotion"></span><span class="visually-hidden"> — </span><span class="visually-hidden" data-i18n="cases.hb.name"></span><span class="visually-hidden" data-i18n="a11y.newTab"></span>
+              <span data-i18n="cases.linkNotion">Case study in Notion</span><span class="visually-hidden"> — </span><span class="visually-hidden" data-i18n="cases.hb.name">HouseBox — AI Ticket Routing + SLA</span><span class="visually-hidden" data-i18n="a11y.newTab"> (opens in a new tab)</span>
               <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg>
             </a>
           </footer>
@@ -389,83 +405,83 @@
         <article class="case case-flagship" aria-labelledby="case-pd-title">
           <div class="case-top">
             <header class="case-head">
-              <p class="badge" data-i18n="cases.pd.badge"></p>
-              <h3 id="case-pd-title" data-i18n="cases.pd.name"></h3>
-              <p class="case-sub" data-i18n="cases.pd.sub"></p>
+              <p class="badge" data-i18n="cases.pd.badge">Flagship project · own, non-commercial</p>
+              <h3 id="case-pd-title" data-i18n="cases.pd.name">PearlDent Clinic</h3>
+              <p class="case-sub" data-i18n="cases.pd.sub">Focus on the front-desk administrator's work: leads, booking, reminders, reporting.</p>
             </header>
             <div class="mock mock-pd" aria-hidden="true" data-motion>
-              <p class="mock-tag" data-i18n="mock.tag"></p>
+              <p class="mock-tag" data-i18n="mock.tag">Mock-up · test data</p>
               <div class="mock-split">
                 <div class="mcard cal">
-                  <p class="mcard-title" data-i18n="mock.pd.calTitle"></p>
+                  <p class="mcard-title" data-i18n="mock.pd.calTitle">Google Calendar · appointments</p>
                   <div class="cal-grid">
-                    <div><span data-i18n="mock.pd.d1"></span><i></i><i></i><i></i></div>
-                    <div><span data-i18n="mock.pd.d2"></span><i></i><i class="slot-hl"></i><i></i></div>
-                    <div><span data-i18n="mock.pd.d3"></span><i></i><i></i></div>
-                    <div><span data-i18n="mock.pd.d4"></span><i></i><i></i><i></i></div>
-                    <div><span data-i18n="mock.pd.d5"></span><i></i><i></i></div>
+                    <div><span data-i18n="mock.pd.d1">Mon</span><i></i><i></i><i></i></div>
+                    <div><span data-i18n="mock.pd.d2">Tue</span><i></i><i class="slot-hl"></i><i></i></div>
+                    <div><span data-i18n="mock.pd.d3">Wed</span><i></i><i></i></div>
+                    <div><span data-i18n="mock.pd.d4">Thu</span><i></i><i></i><i></i></div>
+                    <div><span data-i18n="mock.pd.d5">Fri</span><i></i><i></i></div>
                   </div>
-                  <p class="cal-reminder"><span class="mnotify-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9z"/><path d="M10 20a2.2 2.2 0 0 0 4 0"/></svg></span><span data-i18n="mock.pd.reminder"></span></p>
+                  <p class="cal-reminder"><span class="mnotify-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9z"/><path d="M10 20a2.2 2.2 0 0 0 4 0"/></svg></span><span data-i18n="mock.pd.reminder">Reminder 24 h and 2 h before</span></p>
                 </div>
                 <div class="mcard">
-                  <p class="mcard-title" data-i18n="mock.pd.reportTitle"></p>
+                  <p class="mcard-title" data-i18n="mock.pd.reportTitle">Weekly report · Mon 9:00</p>
                   <ul class="mrows">
-                    <li><span data-i18n="mock.pd.k1"></span><i class="sk w60"></i></li>
-                    <li><span data-i18n="mock.pd.k2"></span><i class="sk w40"></i></li>
-                    <li><span data-i18n="mock.pd.k3"></span><i class="sk w70"></i></li>
-                    <li><span data-i18n="mock.pd.k4"></span><i class="sk w50"></i></li>
+                    <li><span data-i18n="mock.pd.k1">Appointments</span><i class="sk w60"></i></li>
+                    <li><span data-i18n="mock.pd.k2">Leads</span><i class="sk w40"></i></li>
+                    <li><span data-i18n="mock.pd.k3">Reminders</span><i class="sk w70"></i></li>
+                    <li><span data-i18n="mock.pd.k4">Reviews</span><i class="sk w50"></i></li>
                   </ul>
                 </div>
               </div>
             </div>
           </div>
           <div class="case-context">
-            <h4 data-i18n="cases.label.context"></h4>
-            <p data-i18n="cases.pd.context"></p>
+            <h4 data-i18n="cases.label.context">Context (simulated)</h4>
+            <p data-i18n="cases.pd.context">A premium dental clinic in central Kyiv: 4 dentists, 12 staff, 20–30 appointments a day; the administrator handled 40–50 calls a day manually. Test data and estimates, not a real client.</p>
           </div>
           <div class="case-grid">
             <div class="case-block">
-              <h4 data-i18n="cases.label.task"></h4>
+              <h4 data-i18n="cases.label.task">Task</h4>
               <ul class="list">
-                <li data-i18n="cases.pd.p1"></li>
-                <li data-i18n="cases.pd.p2"></li>
-                <li data-i18n="cases.pd.p3"></li>
-                <li data-i18n="cases.pd.p4"></li>
-                <li data-i18n="cases.pd.p5"></li>
+                <li data-i18n="cases.pd.p1">23 no-shows a month (≈ UAH 80,000 in direct losses).</li>
+                <li data-i18n="cases.pd.p2">4+ hours a day on routine calls and reminders.</li>
+                <li data-i18n="cases.pd.p3">Booking only during working hours.</li>
+                <li data-i18n="cases.pd.p4">Leads from messengers were getting lost.</li>
+                <li data-i18n="cases.pd.p5">34 Google Maps reviews vs 180 for a competitor.</li>
               </ul>
             </div>
             <div class="case-block case-result">
-              <h4><span data-i18n="cases.label.result"></span> <span class="note" data-i18n="cases.pd.resultNote"></span></h4>
+              <h4><span data-i18n="cases.label.result">Result</span> <span class="note" data-i18n="cases.pd.resultNote">estimate on test data</span></h4>
               <ul class="list">
-                <li data-i18n="cases.pd.r1"></li>
-                <li data-i18n="cases.pd.r2"></li>
-                <li data-i18n="cases.pd.r3"></li>
-                <li data-i18n="cases.pd.r4"></li>
-                <li data-i18n="cases.pd.r5"></li>
+                <li data-i18n="cases.pd.r1">No-shows 23 → ~9 a month (−60%), losses UAH 80,000 → ~32,000 a month.</li>
+                <li data-i18n="cases.pd.r2">24/7 booking and a 24/7 AI chatbot.</li>
+                <li data-i18n="cases.pd.r3">Reviews are collected automatically, leads from Telegram no longer get lost.</li>
+                <li data-i18n="cases.pd.r4">Weekly report.</li>
+                <li data-i18n="cases.pd.r5">Payback in 1–2 months from no-shows alone (estimate).</li>
               </ul>
             </div>
           </div>
           <details class="case-details">
-            <summary><span data-i18n="cases.pd.more"></span></summary>
+            <summary><span data-i18n="cases.pd.more">More details: 6 workflows, priorities and tests</span></summary>
             <div class="case-details-body">
-              <h4 data-i18n="cases.label.solution"></h4>
-              <p data-i18n="cases.pd.solution"></p>
+              <h4 data-i18n="cases.label.solution">Solution</h4>
+              <p data-i18n="cases.pd.solution">6 independent n8n workflows:</p>
               <ul class="list list-wf">
-                <li data-i18n="cases.pd.wf1"></li>
-                <li data-i18n="cases.pd.wf2"></li>
-                <li data-i18n="cases.pd.wf3"></li>
-                <li data-i18n="cases.pd.wf4"></li>
-                <li data-i18n="cases.pd.wf5"></li>
-                <li data-i18n="cases.pd.wf6"></li>
+                <li data-i18n="cases.pd.wf1">Reminders: hourly Google Calendar check → email + SMS 24 h and 2 h before the appointment → log in Google Sheets → Telegram alert to the administrator on failure.</li>
+                <li data-i18n="cases.pd.wf2">Cancellations: AI detects the intent to cancel or reschedule → checks booked slots → offers 3 free options → the administrator confirms.</li>
+                <li data-i18n="cases.pd.wf3">Reviews: an hour after the appointment, an HTML email asks the patient to leave a Google Maps review.</li>
+                <li data-i18n="cases.pd.wf4">Leads: an AI bot in Telegram detects the intent, collects name, phone and service → CRM (Google Sheets) → notification to the administrator.</li>
+                <li data-i18n="cases.pd.wf5">Online booking: Typeform → Google Calendar event → HTML confirmation to the patient → notification to the administrator.</li>
+                <li data-i18n="cases.pd.wf6">Weekly report: every Monday at 9:00, a summary in Telegram (appointments, leads, reminders, reviews).</li>
               </ul>
-              <p data-i18n="cases.pd.priorities"></p>
-              <p><span class="inline-label" data-i18n="cases.label.tests"></span> <span data-i18n="cases.pd.tests"></span></p>
+              <p data-i18n="cases.pd.priorities">Prioritised by business impact: reminders first (the biggest savings), reporting last.</p>
+              <p><span class="inline-label" data-i18n="cases.label.tests">Tests:</span> <span data-i18n="cases.pd.tests">full cycle of every workflow; edge cases — no email, invalid phone number, events outside the reminder window, incomplete lead data; Continue on Fail with a Failed status in the logs.</span></p>
             </div>
           </details>
           <footer class="case-foot">
-            <p class="stack"><span class="stack-label" data-i18n="cases.label.stack"></span> <span data-i18n="cases.pd.stack"></span></p>
+            <p class="stack"><span class="stack-label" data-i18n="cases.label.stack">Stack:</span> <span data-i18n="cases.pd.stack">n8n Cloud, OpenAI GPT-4o-mini, Google Calendar, Google Sheets, Gmail, Telegram Bot API, Turbo SMS, Typeform</span></p>
             <a class="case-link" href="https://sulky-table-323.notion.site/20a760dd1d5882af891301d0966a79e1" target="_blank" rel="noopener noreferrer">
-              <span data-i18n="cases.linkNotion"></span><span class="visually-hidden"> — </span><span class="visually-hidden" data-i18n="cases.pd.name"></span><span class="visually-hidden" data-i18n="a11y.newTab"></span>
+              <span data-i18n="cases.linkNotion">Case study in Notion</span><span class="visually-hidden"> — </span><span class="visually-hidden" data-i18n="cases.pd.name">PearlDent Clinic</span><span class="visually-hidden" data-i18n="a11y.newTab"> (opens in a new tab)</span>
               <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg>
             </a>
           </footer>
@@ -473,26 +489,26 @@
 
         <!-- Other projects -->
         <div class="others">
-          <h3 data-i18n="others.title"></h3>
+          <h3 data-i18n="others.title">Other projects</h3>
           <ul class="others-list">
             <li>
-              <p class="others-name"><span data-i18n="others.st.name"></span> <span class="note" data-i18n="others.st.badge"></span></p>
-              <p data-i18n="others.st.text"></p>
-              <p class="stack"><span class="stack-label" data-i18n="cases.label.stack"></span> <span data-i18n="others.st.stack"></span></p>
+              <p class="others-name"><span data-i18n="others.st.name">StyleBox — voice AI agent</span> <span class="note" data-i18n="others.st.badge">own project</span></p>
+              <p data-i18n="others.st.text">The agent calls the customer and confirms the order; rules for handing the call over to a person, 7 objections, 7 edge cases. 10 test calls: 8 successful, 2 errors found and documented.</p>
+              <p class="stack"><span class="stack-label" data-i18n="cases.label.stack">Stack:</span> <span data-i18n="others.st.stack">happ.tools, Make, Google Sheets, Zadarma SIP</span></p>
             </li>
             <li>
-              <p class="others-name"><span data-i18n="others.lp.name"></span> <span class="note" data-i18n="others.lp.badge"></span></p>
-              <p data-i18n="others.lp.text"></p>
-              <p class="stack"><span class="stack-label" data-i18n="cases.label.stack"></span> <span data-i18n="others.lp.stack"></span></p>
+              <p class="others-name"><span data-i18n="others.lp.name">AI Lead Processing &amp; Marketing Automation</span> <span class="note" data-i18n="others.lp.badge">training project</span></p>
+              <p data-i18n="others.lp.text">Wix website request → data cleaning → AI segmentation (Hot / Warm / Cold) → CRM → Klaviyo email sequence. Lead processing: 10–15 minutes → 5–15 seconds.</p>
+              <p class="stack"><span class="stack-label" data-i18n="cases.label.stack">Stack:</span> <span data-i18n="others.lp.stack">Wix, n8n, Telegram, Google Sheets, Klaviyo, Zoho CRM</span></p>
             </li>
             <li>
-              <p class="others-name"><span data-i18n="others.gl.name"></span> <span class="note" data-i18n="others.gl.badge"></span></p>
-              <p data-i18n="others.gl.text"></p>
-              <p class="stack"><span class="stack-label" data-i18n="cases.label.stack"></span> <span data-i18n="others.gl.stack"></span></p>
+              <p class="others-name"><span data-i18n="others.gl.name">GrowthLab — AI Sales Ecosystem</span> <span class="note" data-i18n="others.gl.badge">training project</span></p>
+              <p data-i18n="others.gl.text">24/7 AI lead qualification with BANT (Hot / Warm / Cold) → Zoho CRM sync → logging in PostgreSQL → automatic reports for the CEO. Lead qualification: ~20 minutes manually → automatic, 24/7.</p>
+              <p class="stack"><span class="stack-label" data-i18n="cases.label.stack">Stack:</span> <span data-i18n="others.gl.stack">Telegram, Google Sheets, Zoho CRM, PostgreSQL</span></p>
             </li>
           </ul>
           <a class="case-link" href="https://sulky-table-323.notion.site/Elena-Tudos-AI-Automation-Specialist-EN-402760dd1d588192866be307375ff0cc" target="_blank" rel="noopener noreferrer">
-            <span data-i18n="others.link"></span><span class="visually-hidden" data-i18n="a11y.newTab"></span>
+            <span data-i18n="others.link">All projects in my Notion portfolio</span><span class="visually-hidden" data-i18n="a11y.newTab"> (opens in a new tab)</span>
             <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg>
           </a>
         </div>
@@ -502,14 +518,14 @@
     <!-- 6. How I work -->
     <section class="section" id="process" aria-labelledby="process-title">
       <div class="container">
-        <h2 id="process-title" data-i18n="process.title"></h2>
-        <p class="section-lead" data-i18n="process.lead"></p>
+        <h2 id="process-title" data-i18n="process.title">How I work</h2>
+        <p class="section-lead" data-i18n="process.lead">Process and people first, technology second. Every solution comes with tests, error handling and documentation.</p>
         <ol class="steps">
-          <li data-i18n="process.s1"></li>
-          <li data-i18n="process.s2"></li>
-          <li data-i18n="process.s3"></li>
-          <li data-i18n="process.s4"></li>
-          <li data-i18n="process.s5"></li>
+          <li data-i18n="process.s1">Talking to the people who use the process: where time gets lost.</li>
+          <li data-i18n="process.s2">A process map from “as is” to “could be”, and picking the first task with the biggest impact.</li>
+          <li data-i18n="process.s3">A working prototype: n8n, a database, an AI step with a strict response format.</li>
+          <li data-i18n="process.s4">Edge-case tests, error handling and failure alerts.</li>
+          <li data-i18n="process.s5">Documentation and walkthroughs for the team; the final decision always stays with a person.</li>
         </ol>
       </div>
     </section>
@@ -517,50 +533,50 @@
     <!-- 7. Contacts -->
     <section class="section section-accent" id="contact" aria-labelledby="contact-title">
       <div class="container">
-        <h2 id="contact-title" data-i18n="contact.title"></h2>
-        <p class="section-lead" data-i18n="contact.lead"></p>
+        <h2 id="contact-title" data-i18n="contact.title">Contact</h2>
+        <p class="section-lead" data-i18n="contact.lead">Tell me which process takes up most of your team's time.</p>
         <ul class="contacts">
           <li>
             <a href="https://t.me/helena_wro" target="_blank" rel="noopener noreferrer">
-              <span class="contact-label" data-i18n="contact.telegram"></span>
-              <span class="contact-value" data-i18n="contact.telegramValue"></span><span class="visually-hidden" data-i18n="a11y.newTab"></span>
+              <span class="contact-label" data-i18n="contact.telegram">Telegram</span>
+              <span class="contact-value" data-i18n="contact.telegramValue">@helena_wro</span><span class="visually-hidden" data-i18n="a11y.newTab"> (opens in a new tab)</span>
             </a>
           </li>
           <li>
             <a href="mailto:helena.tudos@gmail.com">
-              <span class="contact-label" data-i18n="contact.email"></span>
-              <span class="contact-value" data-i18n="contact.emailValue"></span>
+              <span class="contact-label" data-i18n="contact.email">Email</span>
+              <span class="contact-value" data-i18n="contact.emailValue">helena.tudos@gmail.com</span>
             </a>
           </li>
           <li>
             <a href="tel:+48796494776">
-              <span class="contact-label" data-i18n="contact.phone"></span>
-              <span class="contact-value" data-i18n="contact.phoneValue"></span>
+              <span class="contact-label" data-i18n="contact.phone">Phone</span>
+              <span class="contact-value" data-i18n="contact.phoneValue">+48 796 494 776</span>
             </a>
           </li>
           <li>
             <a href="https://www.linkedin.com/in/olena-tudos" target="_blank" rel="noopener noreferrer">
-              <span class="contact-label" data-i18n="contact.linkedin"></span>
-              <span class="contact-value" data-i18n="contact.linkedinValue"></span><span class="visually-hidden" data-i18n="a11y.newTab"></span>
+              <span class="contact-label" data-i18n="contact.linkedin">LinkedIn</span>
+              <span class="contact-value" data-i18n="contact.linkedinValue">olena-tudos</span><span class="visually-hidden" data-i18n="a11y.newTab"> (opens in a new tab)</span>
             </a>
           </li>
           <li>
             <a href="https://github.com/helentudos" target="_blank" rel="noopener noreferrer">
-              <span class="contact-label" data-i18n="contact.github"></span>
-              <span class="contact-value" data-i18n="contact.githubValue"></span><span class="visually-hidden" data-i18n="a11y.newTab"></span>
+              <span class="contact-label" data-i18n="contact.github">GitHub</span>
+              <span class="contact-value" data-i18n="contact.githubValue">helentudos</span><span class="visually-hidden" data-i18n="a11y.newTab"> (opens in a new tab)</span>
             </a>
           </li>
           <li>
             <a href="https://sulky-table-323.notion.site/Elena-Tudos-AI-Automation-Specialist-EN-402760dd1d588192866be307375ff0cc" target="_blank" rel="noopener noreferrer">
-              <span class="contact-label" data-i18n="contact.notion"></span>
-              <span class="contact-value" data-i18n="contact.notionValue"></span><span class="visually-hidden" data-i18n="a11y.newTab"></span>
+              <span class="contact-label" data-i18n="contact.notion">Notion</span>
+              <span class="contact-value" data-i18n="contact.notionValue">Portfolio (EN)</span><span class="visually-hidden" data-i18n="a11y.newTab"> (opens in a new tab)</span>
             </a>
           </li>
         </ul>
         <dl class="facts">
-          <div><dt data-i18n="contact.locationLabel"></dt><dd data-i18n="contact.location"></dd></div>
-          <div><dt data-i18n="contact.formatLabel"></dt><dd data-i18n="contact.format"></dd></div>
-          <div><dt data-i18n="contact.languagesLabel"></dt><dd data-i18n="contact.languages"></dd></div>
+          <div><dt data-i18n="contact.locationLabel">Location</dt><dd data-i18n="contact.location">Wrocław, Poland; working remotely or hybrid.</dd></div>
+          <div><dt data-i18n="contact.formatLabel">Collaboration</dt><dd data-i18n="contact.format">Open to joining a team or to project-based work.</dd></div>
+          <div><dt data-i18n="contact.languagesLabel">Languages</dt><dd data-i18n="contact.languages">Ukrainian and Russian — native, Polish — C1, English — B1.</dd></div>
         </dl>
       </div>
     </section>
@@ -569,8 +585,8 @@
   <!-- 8. Footer -->
   <footer class="site-footer">
     <div class="container footer-inner">
-      <p data-i18n="footer.copy"></p>
-      <a href="#top" data-i18n="footer.top"></a>
+      <p data-i18n="footer.copy">© 2026 Olena Tudos · AI Automation Specialist</p>
+      <a href="#top" data-i18n="footer.top">Back to top ↑</a>
     </div>
   </footer>
 </body>

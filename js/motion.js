@@ -46,6 +46,32 @@
     document.querySelectorAll('[data-motion]').forEach(function (el) { cssObserver.observe(el); });
   }
 
+  /* ---------- Reveal blocks on scroll ---------- */
+  var REVEAL_SELECTOR = [
+    '.section h2', '.section-lead', '.flow-step', '.cards .card', '.case',
+    '.others h3', '.others-list li', '.steps li', '.contacts li', '.facts > div'
+  ].join(',');
+
+  if (!reduceQuery.matches && 'IntersectionObserver' in window) {
+    var revealObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { rootMargin: '0px 0px -8% 0px' });
+
+    document.querySelectorAll(REVEAL_SELECTOR).forEach(function (el) {
+      // Small stagger for siblings in the same list or grid
+      var index = Array.prototype.indexOf.call(el.parentNode.children, el);
+      el.style.transitionDelay = Math.min(index, 4) * 70 + 'ms';
+      el.classList.add('reveal');
+      revealObserver.observe(el);
+    });
+    document.documentElement.classList.add('reveal-on');
+  }
+
   /* ---------- Counter for the facts (runs once, after translations) ---------- */
   var counted = false;
   var counterFrame = null;

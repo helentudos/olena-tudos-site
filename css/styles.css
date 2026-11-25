@@ -1045,3 +1045,41 @@ main:focus { outline: none; }
     clip: rect(0 0 0 0); white-space: nowrap;
   }
 }
+
+/* ---------- Reveal on scroll (enabled by js/motion.js; never with reduced motion) ---------- */
+.reveal-on .reveal {
+  transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.reveal-on .reveal:not(.is-visible) {
+  opacity: 0;
+  transform: translateY(18px);
+}
+
+/* ---------- Hover effects ---------- */
+.card,
+.case,
+.others-list li,
+.steps li,
+.contacts a,
+.btn {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.15s, color 0.15s;
+}
+.card:hover,
+.case:hover,
+.others-list li:hover,
+.steps li:hover,
+.contacts a:hover {
+  border-color: var(--accent-line);
+  box-shadow: 0 18px 40px -24px rgba(91, 33, 182, 0.45);
+}
+.contacts a:hover { border-color: var(--accent); }
+.section-dark .flow-step:hover { border-color: #a78bfa; }
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .card:hover,
+  .others-list li:hover,
+  .steps li:hover,
+  .contacts a:hover,
+  .btn:hover { transform: translateY(-3px); }
+  .case:hover { transform: translateY(-2px); }
+}

@@ -6,8 +6,8 @@
 (function () {
   'use strict';
 
-  var SUPPORTED = ['uk', 'pl', 'en'];
-  var DEFAULT_LANG = 'en';
+  var SUPPORTED = ['en', 'pl', 'uk'];
+  var DEFAULT_LANG = 'en'; // English is always the default; only a visitor's own choice overrides it
   var STORAGE_KEY = 'lang';
 
   window.I18N = window.I18N || {};
@@ -23,15 +23,6 @@
 
   function saveLang(lang) {
     try { localStorage.setItem(STORAGE_KEY, lang); } catch (e) { /* storage unavailable */ }
-  }
-
-  function browserLang() {
-    var list = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || ''];
-    for (var i = 0; i < list.length; i++) {
-      var code = String(list[i]).toLowerCase().slice(0, 2);
-      if (SUPPORTED.indexOf(code) !== -1) return code;
-    }
-    return null;
   }
 
   function loadDictionary(lang) {
@@ -102,7 +93,7 @@
   // Never leave the page hidden if something goes wrong.
   setTimeout(reveal, 3000);
 
-  setLanguage(savedLang() || browserLang() || DEFAULT_LANG);
+  setLanguage(savedLang() || DEFAULT_LANG);
 
   window.setLanguage = setLanguage;
 })();

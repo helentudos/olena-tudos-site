@@ -62,7 +62,6 @@ window.I18N.uk = {
   "cases.label.stack": "Стек:",
   "cases.linkGithub": "Код на GitHub",
   "cases.linkNotion": "Кейс у Notion",
-  "cases.linkPortfolio": "Портфоліо в Notion",
 
   "cases.fr.badge": "Тестове завдання · 11/2026",
   "cases.fr.name": "Field Report Voice Bot",

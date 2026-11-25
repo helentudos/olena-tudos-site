@@ -62,7 +62,6 @@ window.I18N.pl = {
   "cases.label.stack": "Stack:",
   "cases.linkGithub": "Kod na GitHubie",
   "cases.linkNotion": "Case study w Notion",
-  "cases.linkPortfolio": "Portfolio w Notion",
 
   "cases.fr.badge": "Zadanie rekrutacyjne · 11/2026",
   "cases.fr.name": "Field Report Voice Bot",

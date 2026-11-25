@@ -545,3 +545,26 @@ main:focus { outline: none; }
   .others-list { grid-template-columns: repeat(3, 1fr); }
   .contacts { grid-template-columns: repeat(3, 1fr); }
 }
+
+/* Flagship case on desktop: task | result on top, solution full width below */
+@media (min-width: 960px) {
+  .case-flagship .case-grid { grid-template-columns: repeat(2, 1fr); }
+  .case-flagship .case-grid > :nth-child(1) { grid-column: 1; grid-row: 1; }
+  .case-flagship .case-result { grid-column: 2; grid-row: 1; }
+  .case-flagship .case-solution { grid-column: 1 / -1; grid-row: 2; }
+  .case-flagship .list-wf { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px 40px; }
+  .case-flagship .list-wf li + li { margin-top: 0; }
+}
+
+/* Keep link labels on one line */
+.case-link { white-space: nowrap; flex-shrink: 0; }
+
+/* Narrow phones: icon-only menu button (label stays for screen readers) */
+@media (max-width: 419px) {
+  .header-inner { gap: 8px; }
+  .menu-toggle { padding: 0 10px; min-width: 44px; justify-content: center; }
+  .menu-toggle span {
+    position: absolute; width: 1px; height: 1px; overflow: hidden;
+    clip: rect(0 0 0 0); white-space: nowrap;
+  }
+}

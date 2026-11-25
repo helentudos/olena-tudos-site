@@ -7,8 +7,9 @@ The page explains what Olena does, shows her case studies and lets visitors send
 
 ## Features
 
-- Three languages: Ukrainian, Polish, English, with a language switcher
+- Three languages: English (default), Polish and Ukrainian, with a language switcher
 - Single page, mobile-first, accessible (contrast, alt text, keyboard navigation)
+- Lightweight animations without libraries, disabled when the visitor prefers reduced motion
 - SEO and link previews (title, description, Open Graph) set directly in HTML
 
 ## Tech stack

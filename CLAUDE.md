@@ -1,78 +1,86 @@
-# CLAUDE.md — правила проєкту
+# CLAUDE.md — project rules
 
-## Про проєкт
+## About the project
 
-Особистий лендінг **Олени Тудос**, AI Automation Specialist (n8n, PostgreSQL, LLM API).
+Personal landing page of **Olena Tudos**, AI Automation Specialist (n8n, PostgreSQL, LLM APIs).
 
-Мета сторінки: щоб клієнти й роботодавці швидко зрозуміли, чим Олена корисна, побачили кейси і залишили заявку.
+Goal of the page: clients and employers quickly understand how Olena can help, see her case studies and send an inquiry.
 
-## Позиціонування
+## Positioning
 
-- Напрямок: **автоматизація внутрішніх бізнес-процесів для малого і середнього бізнесу**.
-- Головна думка: **перетворюю хаос із повідомлень, листів, голосових і таблиць на структуровані дані та дії для команди.** Точні формулювання беруться з `content/facts.md`.
-- **Головні кейси** показуються повністю і саме в такому порядку:
+- Focus: **automation of internal business processes for small and medium-sized businesses**.
+- Main message: **I turn the chaos of messages, emails, voice notes and spreadsheets into structured data and actions for the team.** Exact wording comes from `content/facts.md`.
+- **Main case studies** are shown in full and in exactly this order:
   1. Field Report Voice Bot
   2. Candidate Intake & AI Scoring
   3. HouseBox — AI Ticket Routing + SLA
   4. PearlDent Clinic
-- **Інші проєкти** (StyleBox, AI Lead Processing & Marketing Automation, GrowthLab) подаються коротким списком із посиланням на портфоліо в Notion.
-- Статус кейсів (власний, навчальний, демо, тестове завдання) і те, що цифри отримано з тестів і оцінок на тестових даних, показувати чесно, як у `facts.md`.
-- Розділ «Не публікувати» з `facts.md` враховується завжди. Зокрема, назви компаній із тестових завдань не вказуються.
+- **Other projects** (StyleBox, AI Lead Processing & Marketing Automation, GrowthLab) are shown as a short list with a link to the Notion portfolio.
+- Show each project's status (own, training, demo, test assignment) honestly, as in `facts.md`, and state that figures come from tests and estimates on test data.
+- The "Не публікувати" (Do not publish) section of `facts.md` always applies. In particular, company names from test assignments are never shown.
 
-## Мови
+## Languages
 
-- Сайт має три мови: **українська (uk)**, **польська (pl)**, **англійська (en)**.
-- На сторінці є перемикач мов. Вибір мови зберігається між візитами, а атрибут `lang` у `<html>` оновлюється.
-- **Усі тексти живуть в окремих файлах перекладів** (по одному на мову). У HTML немає текстового контенту, тільки ключі (наприклад, `data-i18n="hero.title"`).
-- Нові ключі додаються одразу в усі три файли. Якщо перекладу ще немає, ключ позначається, а текст не вигадується.
+- The site has three languages: **English (en)**, **Polish (pl)**, **Ukrainian (uk)**.
+- **English is the default language.** The page opens in English unless the visitor has chosen another language before; the browser language is not used.
+- The language switcher lists **EN first**, then PL and UA. The chosen language is remembered between visits, and the `lang` attribute on `<html>` is updated.
+- **All texts live in separate translation files** (one per language). HTML contains no text content, only keys (for example `data-i18n="hero.title"`).
+- New keys are added to all three files at once. If a translation is not ready yet, the key is marked as such; text is never invented.
 
-## Стек і верстка
+## Stack and layout
 
-- Чистий **HTML, CSS і JavaScript** без фреймворків, бібліотек і збирачів (bundler).
-- **Одна сторінка** (single page).
-- **Mobile-first**: базові стилі пишуться для мобільних, а для більших екранів додаються `min-width` media queries.
-- **Доступність** (a11y):
-  - достатній контраст тексту (WCAG AA: 4.5:1 для звичайного тексту, 3:1 для великого);
-  - змістовний `alt` для кожного зображення (порожній `alt=""` тільки для декоративних);
-  - повна робота з клавіатури, видимий фокус, логічний порядок Tab;
-  - семантичні теги (`header`, `nav`, `main`, `section`, `footer`), правильна ієрархія заголовків;
-  - підписи (`label`) у полях форми, `aria-*` тільки там, де семантики HTML не вистачає.
+- Plain **HTML, CSS and JavaScript** with no frameworks, libraries or bundlers.
+- **Single page**.
+- **Mobile-first**: base styles target phones; larger screens are handled with `min-width` media queries.
+- **Accessibility** (a11y):
+  - sufficient text contrast (WCAG AA: 4.5:1 for normal text, 3:1 for large text);
+  - meaningful `alt` for every image (empty `alt=""` only for decorative ones);
+  - full keyboard support, visible focus, logical Tab order;
+  - semantic elements (`header`, `nav`, `main`, `section`, `footer`) and a correct heading hierarchy;
+  - `label` for form fields; `aria-*` only where HTML semantics are not enough;
+  - every animation is disabled by `prefers-reduced-motion`.
 
-## SEO і превʼю посилань
+## SEO and link previews
 
-- `<title>`, `<meta name="description">` і Open Graph (`og:title`, `og:description`, `og:image`, `og:url`) задаються **прямо в HTML**, а не через JavaScript, бо LinkedIn і Telegram читають превʼю лише зі статичного HTML.
-- Мова цих тегів за замовчуванням **англійська**.
-- Це єдиний виняток із правила «у HTML немає тексту». Зміст тегів так само береться з `content/facts.md`.
+- `<title>`, `<meta name="description">` and Open Graph (`og:title`, `og:description`, `og:image`, `og:url`) are written **directly in the HTML**, not via JavaScript, because LinkedIn and Telegram read previews from static HTML only.
+- These tags are in **English**.
+- This is the only exception to the "no text in HTML" rule. Their content also comes from `content/facts.md`.
 
-## Форма заявки
+## Inquiry form
 
-- Обовʼязкова галочка **згоди на обробку персональних даних (RODO/GDPR)** з коротким текстом трьома мовами (тексти у файлах перекладів).
-- **Без згоди форма не відправляється.** Перевірка є і на клієнті, і в серверній функції.
+- A required **consent checkbox for personal data processing (RODO/GDPR)** with a short text in all three languages (texts in the translation files).
+- **The form cannot be sent without consent.** This is checked both in the browser and in the serverless function.
 
-## Хостинг
+## Hosting
 
-- **Vercel**, безкоштовний план (Hobby).
-- Форма заявки з'явиться пізніше: її оброблятиме **серверна функція Vercel** (папка `api/`).
+- **Vercel**, free plan (Hobby).
+- The inquiry form will come later and will be handled by a **Vercel serverless function** (`api/` folder).
 
-## Безпека
+## Security
 
-- **У репозиторії немає жодних ключів, токенів, паролів і вебхук-URL із секретами.**
-- Секрети зберігаються тільки в **змінних середовища Vercel** (Environment Variables).
-- Файли `.env*` додано в `.gitignore`. Можна комітити тільки `.env.example` з назвами змінних без значень.
-- Перед кожним комітом перевіряти, чи не потрапили в diff секрети.
+- **No keys, tokens, passwords or webhook URLs with secrets in the repository.**
+- Secrets are stored only in **Vercel Environment Variables**.
+- `.env*` files are listed in `.gitignore`. Only `.env.example` with variable names and no values may be committed.
+- Before every commit, check that no secrets ended up in the diff.
 
-## Контент
+## Content
 
-- **Не вигадувати** факти, цифри, відгуки, клієнтів, кейси, посади чи результати.
-- Єдине джерело правди про Олену: файл **`content/facts.md`** (його надає Олена).
-- Якщо для секції бракує фактів, лишити явний плейсхолдер (наприклад, `TODO: потрібні дані з facts.md`) і сказати про це, а не заповнювати текстом «для прикладу».
+- **Never invent** facts, figures, testimonials, clients, case studies, job titles or results.
+- The single source of truth about Olena is **`content/facts.md`** (provided by Olena).
+- If a section lacks facts, leave an explicit placeholder (for example `TODO: data needed from facts.md`) and say so, instead of filling it with sample text.
+
+## Documentation
+
+- **All documentation in the repository is in English**: `README.md`, `CLAUDE.md`, code comments and commit messages.
+- Exception: `content/facts.md` is Olena's source content and stays as she provides it.
 
 ## Git
 
-- Невеликі коміти, кожен з однією логічною зміною.
-- Повідомлення комітів **англійською**, зрозумілі, в наказовому способі: `Add language switcher`, `Fix contrast in hero section`.
+- Small commits, each with one logical change.
+- Commit messages in **English**, clear, in the imperative mood: `Add language switcher`, `Fix contrast in hero section`.
 
-## Порядок роботи
+## Workflow
 
-- **Перед кожною зміною** коротко описати план: що і в яких файлах буде змінено.
-- **Після зміни** коротко підсумувати, що змінено, і **як перевірити** (що відкрити, куди натиснути, що має з'явитися).
+- **Before each change**, briefly describe the plan: what will change and in which files.
+- **After the change**, briefly summarise what changed and **how to check it** (what to open, what to click, what should appear).
+- Replies to Olena in chat stay in the language she writes in.

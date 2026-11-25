@@ -32,7 +32,7 @@ window.I18N.pl = {
   "hero.ctaSecondary": "Zobacz projekty",
   "hero.fact1": "30+ automatyzacji",
   "hero.fact2": "7 projektów",
-  "hero.fact3": "3 języki",
+  "hero.fact3": "4 języki",
 
   "how.title": "Jak to działa",
   "how.lead": "Jeden schemat, na którym opierają się moje automatyzacje.",

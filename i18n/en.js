@@ -32,7 +32,7 @@ window.I18N.en = {
   "hero.ctaSecondary": "View case studies",
   "hero.fact1": "30+ automations",
   "hero.fact2": "7 projects",
-  "hero.fact3": "3 languages",
+  "hero.fact3": "4 languages",
 
   "how.title": "How it works",
   "how.lead": "One pattern behind my automations.",

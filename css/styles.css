@@ -195,6 +195,23 @@ main:focus { outline: none; }
   cursor: pointer;
 }
 
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px; height: 40px;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+}
+.theme-toggle:hover { color: var(--accent); border-color: var(--accent-line); }
+.theme-toggle .icon-sun { display: none; }
+[data-theme="dark"] .theme-toggle .icon-sun { display: block; }
+[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
+
 /* Mobile nav: hidden until toggled */
 .site-nav {
   display: none;
@@ -1053,6 +1070,9 @@ main:focus { outline: none; }
 @media (max-width: 419px) {
   .header-inner { gap: 8px; }
   .menu-toggle { padding: 0 10px; min-width: 44px; justify-content: center; }
+  .header-actions { gap: 6px; }
+  .theme-toggle { width: 38px; height: 38px; }
+  .lang-switch button { min-width: 34px; padding: 0 6px; }
   .menu-toggle span {
     position: absolute; width: 1px; height: 1px; overflow: hidden;
     clip: rect(0 0 0 0); white-space: nowrap;
@@ -1095,4 +1115,90 @@ main:focus { outline: none; }
   .contacts a:hover,
   .btn:hover { transform: translateY(-3px); }
   .case:hover { transform: translateY(-2px); }
+}
+
+/* ======================================================================
+   Dark theme (html[data-theme="dark"], set in <head> and by the toggle)
+   Text colours keep WCAG AA contrast on the dark surfaces.
+   ====================================================================== */
+[data-theme="dark"] {
+  color-scheme: dark;
+  --accent: #c4b5fd;            /* violet text and outlines on dark, ~10:1 */
+  --accent-strong: #ddd6fe;
+  --accent-fill: #7c3aed;       /* backgrounds behind white text, 5.7:1 */
+  --accent-soft: rgba(139, 92, 246, 0.18);
+  --accent-line: rgba(167, 139, 250, 0.32);
+  --text: #f4f1fd;
+  --muted: #c4bddb;
+  --border: rgba(255, 255, 255, 0.12);
+  --bg: #0f0a22;
+  --bg-alt: #140d2b;
+  --surface: #1b1336;
+  --header-bg: rgba(15, 10, 34, 0.82);
+  --panel: rgba(255, 255, 255, 0.04);
+  --mock-bg: #160f2f;
+  --grid-line: rgba(255, 255, 255, 0.05);
+  --skeleton: linear-gradient(90deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.16));
+  --hl: linear-gradient(90deg, #c4b5fd, #f0abfc);
+  --ok: #4ade80;
+  --note-bg: rgba(251, 191, 36, 0.16);  --note-text: #fcd34d;
+  --chip-ok-bg: rgba(34, 197, 94, 0.16); --chip-ok-text: #86efac;
+  --p1-bg: rgba(239, 68, 68, 0.2);  --p1-text: #fca5a5; --p1-bar: #f87171;
+  --p2-bg: rgba(245, 158, 11, 0.2); --p2-text: #fcd34d;
+  --p3-bg: rgba(148, 163, 184, 0.2); --p3-text: #cbd5e1;
+}
+
+[data-theme="dark"] .hero::before {
+  background:
+    radial-gradient(700px 480px at 78% 35%, rgba(124, 58, 237, 0.55), transparent 70%),
+    radial-gradient(520px 380px at 5% 100%, rgba(91, 33, 182, 0.5), transparent 70%),
+    linear-gradient(180deg, #120c26, #1a1036);
+}
+[data-theme="dark"] .hero-art { filter: drop-shadow(0 30px 60px rgba(0, 0, 0, 0.45)); }
+[data-theme="dark"] .s-flow { stroke: #c4b5fd; }
+
+[data-theme="dark"] .section-alt {
+  background:
+    radial-gradient(700px 420px at 100% 0%, rgba(124, 58, 237, 0.22), transparent 70%),
+    var(--bg-alt);
+}
+[data-theme="dark"] .section-accent {
+  background:
+    radial-gradient(640px 400px at 0% 100%, rgba(124, 58, 237, 0.35), transparent 70%),
+    radial-gradient(520px 360px at 100% 0%, rgba(192, 38, 211, 0.16), transparent 70%),
+    #170f33;
+}
+/* The "How it works" band stays dark; a hairline separates it from dark neighbours */
+[data-theme="dark"] .section-dark {
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+[data-theme="dark"] .btn-primary {
+  background: var(--accent-fill);
+  border-color: var(--accent-fill);
+  box-shadow: 0 10px 30px -10px rgba(124, 58, 237, 0.8);
+}
+[data-theme="dark"] .btn-primary:hover { background: #6d28d9; border-color: #6d28d9; }
+[data-theme="dark"] .btn-secondary { background: transparent; border-color: rgba(221, 214, 254, 0.6); color: var(--accent-strong); }
+[data-theme="dark"] .btn-secondary:hover { background: var(--accent-soft); }
+
+[data-theme="dark"] .site-nav { box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4); }
+[data-theme="dark"] .mcard,
+[data-theme="dark"] .card:hover,
+[data-theme="dark"] .case:hover,
+[data-theme="dark"] .others-list li:hover,
+[data-theme="dark"] .steps li:hover,
+[data-theme="dark"] .contacts a:hover { box-shadow: 0 18px 40px -24px rgba(0, 0, 0, 0.7); }
+[data-theme="dark"] .tg-play { background: #fff; }
+
+/* Very narrow phones (e.g. 320 px): fit brand, theme, languages and menu in one row */
+@media (max-width: 359px) {
+  .container { padding: 0 16px; }
+  .brand { font-size: 0.95rem; }
+  .header-inner { gap: 6px; }
+  .header-actions { gap: 4px; }
+  .theme-toggle { width: 36px; height: 36px; }
+  .lang-switch button { min-width: 30px; padding: 0 4px; }
+  .menu-toggle { min-width: 40px; padding: 0 8px; }
 }

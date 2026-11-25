@@ -72,6 +72,7 @@
     document.querySelectorAll('[data-lang]').forEach(function (btn) {
       btn.setAttribute('aria-pressed', String(btn.getAttribute('data-lang') === lang));
     });
+    document.dispatchEvent(new CustomEvent('i18n:applied', { detail: { lang: lang } }));
   }
 
   function reveal() {

@@ -330,38 +330,67 @@ main:focus { outline: none; }
   gap: 12px;
 }
 
+/* Gradient highlight inside the headline */
+.hl {
+  font-style: normal;
+  color: var(--accent);
+  background: linear-gradient(90deg, #6d28d9, #a21caf);
+  -webkit-background-clip: text;
+          background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Key facts with large numbers */
 .hero-facts {
   list-style: none;
   display: flex;
   flex-wrap: wrap;
-  gap: 4px 0;
-  margin-top: 28px;
-  color: var(--muted);
-  font-weight: 600;
-  font-size: 0.95rem;
+  margin-top: 32px;
 }
-.hero-facts li { white-space: nowrap; }
-.hero-facts li:not(:last-child)::after {
-  content: "·";
-  margin: 0 8px;
-  color: var(--accent);
+.hero-facts li {
+  display: flex;
+  flex-direction: column;
+  padding: 0 18px;
+  border-left: 1px solid var(--border);
 }
+.hero-facts li:first-child { padding-left: 0; border-left: 0; }
+.fact-num {
+  font-family: var(--font-head);
+  font-weight: 800;
+  font-size: 1.6rem;
+  line-height: 1.2;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.fact-label { color: var(--muted); font-size: 0.9rem; }
 
-/* Hero illustration (decorative, desktop only) */
-.hero-art { display: none; }
+/* Animated hero scene (decorative). Phones: small, under the buttons, lighter. */
+.hero-art {
+  max-width: 300px;
+  margin-top: 32px;
+}
 .hero-art svg { display: block; width: 100%; height: auto; }
-.il-panel { fill: var(--bg-alt); stroke: var(--border); }
-.il-link { fill: none; stroke: var(--accent-line); stroke-width: 2.5; stroke-dasharray: 6 7; stroke-linecap: round; }
-.il-box, .il-card { fill: #fff; stroke: var(--accent-line); stroke-width: 1.5; }
-.il-icon { fill: none; stroke: var(--accent); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-.il-ai { fill: var(--accent); }
-.il-ai-glow { fill: var(--accent-soft); }
-.il-ai-icon { fill: none; stroke: #fff; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
-.il-stroke-white { stroke-width: 2.4; }
-.il-card-head { fill: var(--accent-soft); }
-.il-dot, .il-bar-accent, .il-badge { fill: var(--accent); }
-.il-pill { fill: var(--accent-soft); stroke: var(--accent-line); }
-.il-bar { fill: var(--border); }
+.s-panel { fill: rgba(255, 255, 255, 0.75); stroke: var(--border); }
+.s-path { fill: none; stroke: var(--accent-line); stroke-width: 2; stroke-dasharray: 5 7; stroke-linecap: round; }
+.s-flow { fill: none; stroke: #a78bfa; stroke-width: 2.5; stroke-dasharray: 4 10; stroke-linecap: round; }
+.s-src > rect { fill: #fff; stroke: var(--border); }
+.s-src { opacity: 0.55; }
+.s-tok > rect { fill: #fff; stroke: var(--accent); stroke-width: 1.5; }
+.s-ico { fill: none; stroke: var(--accent); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.s-ai { fill: url(#hero-g-ai); }
+.s-glow { fill: var(--accent); }
+.s-ai-icon { fill: none; stroke: #fff; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.s-card { fill: #fff; stroke: var(--accent-line); stroke-width: 1.5; }
+.s-head, .s-pill { fill: var(--accent-soft); }
+.s-bar { fill: var(--border); }
+.s-acc { fill: var(--accent); }
+.s-bell { fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.s-ok { fill: none; stroke: #15803d; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+
+/* Lighter on phones: no glow and no flowing dashes */
+@media (max-width: 959px) {
+  .s-glow, .s-flow { display: none; }
+}
 
 /* ---------- How it works (flow) ---------- */
 .flow {
@@ -611,8 +640,8 @@ main:focus { outline: none; }
 @media (min-width: 600px) {
   .container { padding: 0 32px; }
   .hero-actions { flex-direction: row; flex-wrap: wrap; }
-  .hero-facts { font-size: 1rem; }
-  .hero-facts li:not(:last-child)::after { margin: 0 12px; }
+  .hero-facts li { padding: 0 24px; }
+  .fact-num { font-size: 1.9rem; }
   .cards { grid-template-columns: repeat(2, 1fr); }
   .contacts { grid-template-columns: repeat(2, 1fr); }
   .facts { grid-template-columns: repeat(3, 1fr); }
@@ -632,7 +661,7 @@ main:focus { outline: none; }
     align-items: center;
   }
   .hero h1 { font-size: clamp(2.2rem, 3.4vw, 3rem); }
-  .hero-art { display: block; }
+  .hero-art { max-width: none; margin-top: 0; filter: drop-shadow(0 30px 60px rgba(91, 33, 182, 0.14)); }
   .case { padding: 36px; }
 
   .menu-toggle { display: none; }

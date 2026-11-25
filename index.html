@@ -23,6 +23,7 @@
   <link rel="stylesheet" href="css/styles.css">
   <script src="js/i18n.js" defer></script>
   <script src="js/main.js" defer></script>
+  <script src="js/motion.js" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main" data-i18n="a11y.skip"></a>
@@ -62,88 +63,80 @@
       <div class="container hero-inner">
         <div class="hero-text">
           <p class="eyebrow" data-i18n="hero.eyebrow"></p>
-          <h1 id="hero-title" data-i18n="hero.title"></h1>
+          <h1 id="hero-title"><span data-i18n="hero.title.before"></span><em class="hl" data-i18n="hero.title.em"></em><span data-i18n="hero.title.after"></span></h1>
           <p class="hero-lead" data-i18n="hero.lead"></p>
           <div class="hero-actions">
             <a class="btn btn-primary" href="#contact" data-i18n="hero.ctaPrimary"></a>
             <a class="btn btn-secondary" href="#cases" data-i18n="hero.ctaSecondary"></a>
           </div>
           <ul class="hero-facts">
-            <li data-i18n="hero.fact1"></li>
-            <li data-i18n="hero.fact2"></li>
-            <li data-i18n="hero.fact3"></li>
+            <li><span class="fact-num" data-i18n="hero.fact1.num"></span> <span class="fact-label" data-i18n="hero.fact1.label"></span></li>
+            <li><span class="fact-num" data-i18n="hero.fact2.num"></span> <span class="fact-label" data-i18n="hero.fact2.label"></span></li>
+            <li><span class="fact-num" data-i18n="hero.fact3.num"></span> <span class="fact-label" data-i18n="hero.fact3.label"></span></li>
           </ul>
         </div>
 
-        <!-- Decorative illustration of the pattern: inputs → AI → structured data + notification -->
+        <!-- Decorative animated scene: inputs → AI → structured data + notification (SMIL; paused for reduced motion and off-screen in js/main.js) -->
         <div class="hero-art" aria-hidden="true">
-          <svg viewBox="0 0 520 420" focusable="false" xmlns="http://www.w3.org/2000/svg">
-            <rect class="il-panel" x="0" y="0" width="520" height="420" rx="28"/>
-
-            <!-- Connectors: inputs → AI -->
-            <g class="il-link">
-              <path d="M96 72 C150 72 150 210 196 210"/>
-              <path d="M96 162 C150 162 150 210 196 210"/>
-              <path d="M96 258 C150 258 150 210 196 210"/>
-              <path d="M96 348 C150 348 150 210 196 210"/>
-              <!-- AI → card and notification -->
-              <path d="M304 210 C330 210 330 160 352 160"/>
-              <path d="M304 210 C330 210 330 330 352 330"/>
-            </g>
-
-            <!-- Inputs -->
-            <g class="il-box">
-              <rect x="32" y="40" width="64" height="64" rx="16"/>
-              <rect x="32" y="130" width="64" height="64" rx="16"/>
-              <rect x="32" y="226" width="64" height="64" rx="16"/>
-              <rect x="32" y="316" width="64" height="64" rx="16"/>
-            </g>
-            <g class="il-icon">
-              <!-- message -->
-              <g transform="translate(49 57) scale(1.25)"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/><path d="M8.5 11h7M8.5 14h4"/></g>
-              <!-- email -->
-              <g transform="translate(49 147) scale(1.25)"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 6.5l8.5 6 8.5-6"/></g>
-              <!-- voice -->
-              <g transform="translate(49 243) scale(1.25)"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></g>
-              <!-- spreadsheet -->
-              <g transform="translate(49 333) scale(1.25)"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9.5h18M3 14.5h18M9.5 4v16"/></g>
-            </g>
-
-            <!-- AI block -->
-            <rect class="il-ai-glow" x="184" y="146" width="132" height="128" rx="34"/>
-            <rect class="il-ai" x="196" y="158" width="108" height="104" rx="26"/>
-            <g class="il-ai-icon" transform="translate(220 180) scale(2.5)">
-              <path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/>
-              <path d="M18.5 15.5l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/>
-            </g>
-
-            <!-- Structured data card -->
-            <rect class="il-card" x="352" y="70" width="140" height="180" rx="16"/>
-            <rect class="il-card-head" x="352" y="70" width="140" height="34" rx="16"/>
-            <rect class="il-card-head" x="352" y="88" width="140" height="16"/>
-            <circle class="il-dot" cx="370" cy="87" r="5"/>
-            <rect class="il-bar-accent" x="382" y="83" width="48" height="8" rx="4"/>
-            <g>
-              <rect class="il-pill" x="366" y="122" width="34" height="12" rx="6"/>
-              <rect class="il-bar" x="408" y="124" width="70" height="8" rx="4"/>
-              <rect class="il-pill" x="366" y="150" width="34" height="12" rx="6"/>
-              <rect class="il-bar" x="408" y="152" width="56" height="8" rx="4"/>
-              <rect class="il-pill" x="366" y="178" width="34" height="12" rx="6"/>
-              <rect class="il-bar" x="408" y="180" width="64" height="8" rx="4"/>
-              <rect class="il-pill" x="366" y="206" width="34" height="12" rx="6"/>
-              <rect class="il-bar" x="408" y="208" width="44" height="8" rx="4"/>
-            </g>
-
-            <!-- Notification -->
-            <rect class="il-card" x="352" y="296" width="140" height="68" rx="16"/>
-            <circle class="il-ai" cx="384" cy="330" r="16"/>
-            <g class="il-ai-icon il-stroke-white" transform="translate(375 321) scale(0.75)">
-              <path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9z"/><path d="M10 20a2.2 2.2 0 0 0 4 0"/>
-            </g>
-            <rect class="il-bar-accent" x="410" y="318" width="64" height="8" rx="4"/>
-            <rect class="il-bar" x="410" y="334" width="46" height="8" rx="4"/>
-            <circle class="il-badge" cx="488" cy="300" r="9"/>
-          </svg>
+            <svg class="hero-scene" viewBox="0 0 560 440" focusable="false" xmlns="http://www.w3.org/2000/svg">
+              <defs><linearGradient id="hero-g-ai" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7c3aed"/><stop offset="1" stop-color="#c026d3"/></linearGradient></defs>
+              <rect class="s-panel" x="0" y="0" width="560" height="440" rx="28"/>
+              <!-- Paths from inputs to AI -->
+              <path id="hero-p0" class="s-path" d="M70 80 C175 80 175 220 280 220"/>
+              <path id="hero-p1" class="s-path" d="M70 170 C175 170 175 220 280 220"/>
+              <path id="hero-p2" class="s-path" d="M70 260 C175 260 175 220 280 220"/>
+              <path id="hero-p3" class="s-path" d="M70 350 C175 350 175 220 280 220"/>
+              <!-- Flow from AI to outputs -->
+              <path class="s-flow" d="M330 220 C360 220 360 160 400 160"><animate attributeName="stroke-dashoffset" values="28;0" dur="1s" repeatCount="indefinite"/></path>
+              <path class="s-flow" d="M330 220 C360 220 360 332 400 332"><animate attributeName="stroke-dashoffset" values="28;0" dur="1s" repeatCount="indefinite"/></path>
+              <!-- Input sources -->
+              <g class="s-src" transform="translate(50 80)"><rect x="-24" y="-24" width="48" height="48" rx="13"/><g class="s-ico" transform="translate(-12 -12)"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/><path d="M8.5 11h7M8.5 14h4"/></g></g>
+              <g class="s-src" transform="translate(50 170)"><rect x="-24" y="-24" width="48" height="48" rx="13"/><g class="s-ico" transform="translate(-12 -12)"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 6.5l8.5 6 8.5-6"/></g></g>
+              <g class="s-src" transform="translate(50 260)"><rect x="-24" y="-24" width="48" height="48" rx="13"/><g class="s-ico" transform="translate(-12 -12)"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></g></g>
+              <g class="s-src" transform="translate(50 350)"><rect x="-24" y="-24" width="48" height="48" rx="13"/><g class="s-ico" transform="translate(-12 -12)"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9.5h18M3 14.5h18M9.5 4v16"/></g></g>
+              <!-- Moving tokens -->
+              <g class="s-tok" opacity="0"><rect x="-20" y="-20" width="40" height="40" rx="11"/><g class="s-ico" transform="translate(-10.8 -10.8) scale(.9)"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/><path d="M8.5 11h7M8.5 14h4"/></g>
+                <animateMotion dur="6s" repeatCount="indefinite" calcMode="linear" keyPoints="0;0;1;1" keyTimes="0;0.04;0.3;1"><mpath href="#hero-p0"/></animateMotion>
+                <animate attributeName="opacity" dur="6s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.04;0.07;0.27;0.3;1"/></g>
+              <g class="s-tok" opacity="0"><rect x="-20" y="-20" width="40" height="40" rx="11"/><g class="s-ico" transform="translate(-10.8 -10.8) scale(.9)"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 6.5l8.5 6 8.5-6"/></g>
+                <animateMotion dur="6s" repeatCount="indefinite" calcMode="linear" keyPoints="0;0;1;1" keyTimes="0;0.11;0.37;1"><mpath href="#hero-p1"/></animateMotion>
+                <animate attributeName="opacity" dur="6s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.11;0.14;0.34;0.37;1"/></g>
+              <g class="s-tok" opacity="0"><rect x="-20" y="-20" width="40" height="40" rx="11"/><g class="s-ico" transform="translate(-10.8 -10.8) scale(.9)"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></g>
+                <animateMotion dur="6s" repeatCount="indefinite" calcMode="linear" keyPoints="0;0;1;1" keyTimes="0;0.18;0.44;1"><mpath href="#hero-p2"/></animateMotion>
+                <animate attributeName="opacity" dur="6s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.18;0.21;0.41;0.44;1"/></g>
+              <g class="s-tok" opacity="0"><rect x="-20" y="-20" width="40" height="40" rx="11"/><g class="s-ico" transform="translate(-10.8 -10.8) scale(.9)"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9.5h18M3 14.5h18M9.5 4v16"/></g>
+                <animateMotion dur="6s" repeatCount="indefinite" calcMode="linear" keyPoints="0;0;1;1" keyTimes="0;0.25;0.51;1"><mpath href="#hero-p3"/></animateMotion>
+                <animate attributeName="opacity" dur="6s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.25;0.28;0.48;0.51;1"/></g>
+              <!-- AI block -->
+              <rect class="s-glow" x="214" y="154" width="132" height="132" rx="36" opacity=".15"><animate attributeName="opacity" dur="6s" repeatCount="indefinite" values=".15;.15;.45;.15;.15" keyTimes="0;.3;.45;.6;1"/></rect>
+              <rect class="s-ai" x="230" y="170" width="100" height="100" rx="28"/>
+              <g class="s-ai-icon" transform="translate(250 190) scale(2.5)"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M18.5 15.5l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/>
+                <animateTransform attributeName="transform" type="rotate" additive="sum" dur="6s" repeatCount="indefinite" values="0 12 12;0 12 12;90 12 12;90 12 12" keyTimes="0;.32;.46;1"/></g>
+              <!-- Structured data card -->
+              <g opacity="0"><animate attributeName="opacity" dur="6s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;.46;.52;.9;.96;1"/>
+                <animateTransform attributeName="transform" type="translate" dur="6s" repeatCount="indefinite" values="0 14;0 14;0 0;0 0" keyTimes="0;.46;.52;1"/>
+                <rect class="s-card" x="400" y="70" width="140" height="180" rx="16"/>
+                <path class="s-head" d="M400 86a16 16 0 0 1 16-16h108a16 16 0 0 1 16 16v18H400z"/>
+                <circle class="s-acc" cx="418" cy="87" r="5"/><rect class="s-acc" x="430" y="83" width="50" height="8" rx="4"/>
+                <rect class="s-pill" x="414" y="122" width="32" height="12" rx="6"/>
+                <rect class="s-bar" x="454" y="124" width="0" height="8" rx="4"><animate attributeName="width" dur="6s" repeatCount="indefinite" values="0;0;70;70;0" keyTimes="0;0.52;0.57;0.96;1"/></rect>
+                <rect class="s-pill" x="414" y="150" width="32" height="12" rx="6"/>
+                <rect class="s-bar" x="454" y="152" width="0" height="8" rx="4"><animate attributeName="width" dur="6s" repeatCount="indefinite" values="0;0;56;56;0" keyTimes="0;0.555;0.605;0.96;1"/></rect>
+                <rect class="s-pill" x="414" y="178" width="32" height="12" rx="6"/>
+                <rect class="s-bar" x="454" y="180" width="0" height="8" rx="4"><animate attributeName="width" dur="6s" repeatCount="indefinite" values="0;0;64;64;0" keyTimes="0;0.59;0.64;0.96;1"/></rect>
+                <rect class="s-pill" x="414" y="206" width="32" height="12" rx="6"/>
+                <rect class="s-bar" x="454" y="208" width="0" height="8" rx="4"><animate attributeName="width" dur="6s" repeatCount="indefinite" values="0;0;44;44;0" keyTimes="0;0.625;0.675;0.96;1"/></rect>
+              </g>
+              <!-- Notification -->
+              <g opacity="0"><animate attributeName="opacity" dur="6s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;.66;.71;.9;.96;1"/>
+                <animateTransform attributeName="transform" type="translate" dur="6s" repeatCount="indefinite" values="18 0;18 0;0 0;0 0" keyTimes="0;.66;.71;1"/>
+                <rect class="s-card" x="400" y="298" width="140" height="68" rx="16"/>
+                <circle class="s-ai" cx="432" cy="332" r="17"/>
+                <g class="s-bell" transform="translate(423 323) scale(.75)"><path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9z"/><path d="M10 20a2.2 2.2 0 0 0 4 0"/></g>
+                <rect class="s-acc" x="458" y="320" width="62" height="8" rx="4"/><rect class="s-bar" x="458" y="336" width="44" height="8" rx="4"/>
+                <path class="s-ok" d="M506 336l5 5 9-10" opacity="0"><animate attributeName="opacity" dur="6s" repeatCount="indefinite" values="0;0;1;1;0" keyTimes="0;.74;.77;.92;.96"/></path>
+              </g>
+            </svg>
         </div>
       </div>
     </section>

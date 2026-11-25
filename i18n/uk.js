@@ -1,4 +1,4 @@
-/* Українська. Джерело фактів: content/facts.md */
+/* Ukrainian. Source of facts: content/facts.md */
 window.I18N = window.I18N || {};
 window.I18N.uk = {
   "meta.title": "Олена Тудос — AI Automation Specialist",

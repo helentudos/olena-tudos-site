@@ -1,4 +1,4 @@
-/* Polski. Źródło faktów: content/facts.md */
+/* Polish. Source of facts: content/facts.md */
 window.I18N = window.I18N || {};
 window.I18N.pl = {
   "meta.title": "Olena Tudos — AI Automation Specialist",

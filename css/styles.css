@@ -392,31 +392,75 @@ main:focus { outline: none; }
   .s-glow, .s-flow { display: none; }
 }
 
-/* ---------- How it works (flow) ---------- */
+/* ---------- How it works (dark section, animated flow) ---------- */
+.section-dark {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  color: #f6f3ff;
+  background:
+    radial-gradient(700px 460px at 85% 10%, rgba(124, 58, 237, 0.45), transparent 70%),
+    radial-gradient(560px 400px at 0% 100%, rgba(91, 33, 182, 0.45), transparent 70%),
+    #140d2b;
+}
+.section-dark::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+  background-size: 40px 40px;
+  -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, #000 30%, transparent 80%);
+          mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, #000 30%, transparent 80%);
+}
+.section-dark .section-lead { color: #cdc6e6; }
+.section-dark :focus-visible { outline-color: #c4b5fd; }
+
 .flow {
   list-style: none;
   display: grid;
-  gap: 28px;
+  gap: 32px;
 }
 
 .flow-step {
+  --d: 0s;
   position: relative;
-  background: #fff;
-  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: var(--radius);
   padding: 22px;
+  animation: flow-step 8s var(--d) infinite;
 }
+.flow-step:nth-child(2) { --d: 2s; }
+.flow-step:nth-child(3) { --d: 4s; }
+.flow-step:nth-child(4) { --d: 6s; }
 
-/* Arrow between steps (decorative) */
+/* Connector line between steps (decorative) */
 .flow-step:not(:last-child)::after {
   content: "";
   position: absolute;
   left: 50%;
-  bottom: -22px;
-  width: 12px; height: 12px;
-  border-right: 2px solid var(--accent);
-  border-bottom: 2px solid var(--accent);
-  transform: translateX(-50%) rotate(45deg);
+  top: 100%;
+  width: 2px;
+  height: 32px;
+  transform: translateX(-50%);
+  background: repeating-linear-gradient(180deg, rgba(196, 181, 253, 0.55) 0 4px, transparent 4px 8px);
+}
+/* Dot travelling along the connector */
+.flow-step:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  width: 10px; height: 10px;
+  margin-left: -5px;
+  border-radius: 50%;
+  background: #c4b5fd;
+  box-shadow: 0 0 12px 3px rgba(167, 139, 250, 0.8);
+  opacity: 0;
+  animation: flow-dot-y 8s calc(var(--d) + 1s) infinite;
 }
 
 .flow-icon {
@@ -425,14 +469,46 @@ main:focus { outline: none; }
   justify-content: center;
   width: 48px; height: 48px;
   border-radius: 12px;
-  background: var(--accent-soft);
-  color: var(--accent);
+  background: rgba(139, 92, 246, 0.22);
+  color: #c4b5fd;
   margin-bottom: 14px;
+  animation: flow-icon 8s var(--d) infinite;
 }
 .flow-icon svg { width: 26px; height: 26px; }
 
-.flow-step h3 { font-size: 1.1rem; margin-bottom: 6px; }
-.flow-step p { color: var(--muted); }
+.flow-step h3 { font-size: 1.1rem; margin-bottom: 6px; color: #fff; }
+.flow-step p { color: #cdc6e6; }
+
+@keyframes flow-step {
+  0%, 28%, 100% { border-color: rgba(255, 255, 255, 0.14); box-shadow: none; background: rgba(255, 255, 255, 0.05); }
+  6%, 20% { border-color: #a78bfa; background: rgba(139, 92, 246, 0.14); box-shadow: 0 18px 50px -20px rgba(139, 92, 246, 0.9); }
+}
+@keyframes flow-icon {
+  0%, 28%, 100% { background: rgba(139, 92, 246, 0.22); color: #c4b5fd; }
+  6%, 20% { background: #7c3aed; color: #fff; }
+}
+@keyframes flow-dot-y {
+  0% { opacity: 0; transform: translateY(-2px); }
+  2% { opacity: 1; }
+  11% { opacity: 1; }
+  12%, 100% { opacity: 0; transform: translateY(24px); }
+}
+@keyframes flow-dot-x {
+  0% { opacity: 0; transform: translateX(-2px); }
+  2% { opacity: 1; }
+  11% { opacity: 1; }
+  12%, 100% { opacity: 0; transform: translateX(26px); }
+}
+
+/* Pause when off-screen (class set in js/motion.js) */
+.is-offscreen .flow-step,
+.is-offscreen .flow-step::before,
+.is-offscreen .flow-icon { animation-play-state: paused; }
+
+@media (prefers-reduced-motion: reduce) {
+  .flow-step, .flow-icon { animation: none; }
+  .flow-step:not(:last-child)::before { display: none; }
+}
 
 /* ---------- Service cards ---------- */
 .cards {
@@ -680,11 +756,18 @@ main:focus { outline: none; }
 
   .flow { grid-template-columns: repeat(4, 1fr); gap: 32px; }
   .flow-step:not(:last-child)::after {
-    left: auto;
-    right: -22px;
-    bottom: auto;
+    left: 100%;
     top: 50%;
-    transform: translateY(-50%) rotate(-45deg);
+    width: 32px;
+    height: 2px;
+    transform: translateY(-50%);
+    background: repeating-linear-gradient(90deg, rgba(196, 181, 253, 0.55) 0 4px, transparent 4px 8px);
+  }
+  .flow-step:not(:last-child)::before {
+    left: 100%;
+    top: 50%;
+    margin: -5px 0 0 -2px;
+    animation-name: flow-dot-x;
   }
 
   .case-grid { grid-template-columns: repeat(3, 1fr); gap: 32px; }

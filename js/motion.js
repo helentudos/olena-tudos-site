@@ -36,6 +36,16 @@
     updateScene();
   }
 
+  /* ---------- CSS animations: pause while off-screen ---------- */
+  if ('IntersectionObserver' in window) {
+    var cssObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        entry.target.classList.toggle('is-offscreen', !entry.isIntersecting);
+      });
+    });
+    document.querySelectorAll('[data-motion]').forEach(function (el) { cssObserver.observe(el); });
+  }
+
   /* ---------- Counter for the facts (runs once, after translations) ---------- */
   var counted = false;
   var counterFrame = null;

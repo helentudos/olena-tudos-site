@@ -117,6 +117,7 @@ window.I18N.pl = {
 
   "others.title": "Inne projekty",
   "others.st.name": "StyleBox — głosowy agent AI",
+  "others.st.badge": "projekt własny",
   "others.st.text": "Agent dzwoni do klienta i potwierdza zamówienie; zasady przekazania rozmowy człowiekowi, 7 obiekcji, 7 przypadków brzegowych. 10 testowych połączeń: 8 udanych, 2 błędy znalezione i udokumentowane.",
   "others.st.stack": "happ.tools, Make, Google Sheets, Zadarma SIP",
   "others.lp.name": "AI Lead Processing & Marketing Automation",

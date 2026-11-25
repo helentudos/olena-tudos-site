@@ -117,6 +117,7 @@ window.I18N.en = {
 
   "others.title": "Other projects",
   "others.st.name": "StyleBox — voice AI agent",
+  "others.st.badge": "own project",
   "others.st.text": "The agent calls the customer and confirms the order; rules for handing the call over to a person, 7 objections, 7 edge cases. 10 test calls: 8 successful, 2 errors found and documented.",
   "others.st.stack": "happ.tools, Make, Google Sheets, Zadarma SIP",
   "others.lp.name": "AI Lead Processing & Marketing Automation",

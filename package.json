@@ -1,0 +1,16 @@
+{
+  "name": "olena-tudos-site",
+  "private": true,
+  "description": "Personal landing page of Olena Tudos. Dependencies are used only by the serverless function in api/.",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "check": "node scripts/check-i18n.js && node scripts/prerender.js --check",
+    "test": "node scripts/test-lead.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.14.0",
+    "zod": "^4.6.7"
+  }
+}

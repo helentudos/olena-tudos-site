@@ -1,5 +1,7 @@
 # olena-tudos-site
 
+**Live site: [olena-tudos-site.vercel.app](https://olena-tudos-site.vercel.app)**
+
 Personal landing page of **Olena Tudos**, AI Automation Specialist (n8n, PostgreSQL, LLM APIs).
 Automation of internal business processes for small and medium-sized businesses.
 

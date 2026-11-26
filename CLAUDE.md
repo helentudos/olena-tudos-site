@@ -69,7 +69,7 @@ The form follows the site's own pattern: incoming text → AI structures it → 
 ### Consent and privacy (RODO/GDPR)
 
 - A required **consent checkbox**. **The form cannot be sent without consent**: the browser blocks it and the server rejects any request without `consent: true`.
-- The consent text says, in plain words: the data goes to Olena, is processed by an AI service (Anthropic's Claude API) to sort the request, is delivered to her via Telegram, is not stored on the website, and how to ask for deletion. The final wording is approved by Olena.
+- The consent text (version `v1`) says, in plain words: the data goes to Olena to reply to the inquiry; it is sorted by an AI service (Claude by Anthropic) and delivered to her via Telegram; Anthropic and Telegram process it as service providers, including outside the EU; it is not stored on the website; Olena keeps it until the conversation ends, for no longer than 12 months; and deletion can be requested by email. Any change to the wording gets a new version (`v2`, …) in `js/form.js` and `api/_lib/validate.js`.
 - The Telegram message records when consent was given and which version of the consent text was shown.
 - The browser talks only to the site's own `/api/lead`; no cookies and no third-party requests are added.
 
@@ -77,12 +77,16 @@ The form follows the site's own pattern: incoming text → AI structures it → 
 
 Order: validate → spam checks → Claude → Telegram → reply to the visitor. Helpers live in `api/_lib/` (files starting with `_` are not routes).
 
-- **Spam:** if the honeypot is filled or the form was sent too fast, answer as if it succeeded and send nothing. Requests must come from the site's own origin. A best-effort per-IP limit applies (real rate limiting comes with the database).
+- **Bots:** if the honeypot is filled or the form was sent in under 3 seconds, answer as if it succeeded and send nothing.
+- **Origin:** requests must come from the production domain or from the deployment's own URL (Vercel system variables `VERCEL_URL`, `VERCEL_BRANCH_URL`, `VERCEL_PROJECT_PRODUCTION_URL`), so every Preview deployment accepts requests from itself. Extra origins only via `ALLOWED_ORIGINS`.
+- **Rate limit:** a best-effort per-IP limit (5 per 10 minutes) in production only; real rate limiting comes with the database.
+- **Spam or injection flagged by the AI** (`spam_likelihood: "high"` or `injection_suspected: true`): never dropped silently. The lead is sent to Olena with a ⚠️ mark, and the visitor sees the neutral confirmation.
 - **Claude:** model `claude-haiku-5-5` through the official SDK, `effort: "low"`, structured outputs with a strict JSON schema (enums wherever possible), a short timeout, and the result validated again in code. Fields: `service`, `process`, `department`, `urgency`, `team_size`, `summary`, `first_question`, `reply_for_visitor`, `visitor_language`, `spam_likelihood`, `injection_suspected`. `service` is one of the four services in `facts.md` or `other`; unknown facts are `unknown`, never guessed.
 - **Fallback:** on any Claude failure (timeout, API error, refusal, output that fails validation) the lead still reaches Olena as raw text, marked as unclassified, and the visitor sees a neutral confirmation.
 - **Telegram:** Bot API `sendMessage` with `parse_mode: "HTML"`; every dynamic value is HTML-escaped; the message stays under Telegram's 4096-character limit.
 - **If Telegram fails**, the visitor is told honestly that the message was not delivered and is shown the email and Telegram contacts (with no database yet, the lead would otherwise be lost).
-- **Visitor reply:** `reply_for_visitor` (2–3 sentences, the visitor's language, no promises about price or timing) is shown as plain text (`textContent`, length-capped) together with a confirmation that Olena will answer. If the AI failed or flagged spam or an injection attempt, a neutral confirmation is shown instead.
+- **Visitor reply:** `reply_for_visitor` (2–3 sentences, the visitor's language, no promises about price or timing) is shown as plain text (`textContent`, length-capped) with a small label "Automatic reply · Olena will reply personally" in the page language, for transparency about AI. A reply containing a link, contact or markup is never shown. If the AI failed or flagged spam or an injection attempt, a neutral confirmation is shown instead.
+- **Debug output:** classification details are returned only when `VERCEL_ENV` is `preview` and the request has `x-lead-debug: 1` (used by the live test script); production never returns them.
 
 ### Prompt-injection defence
 
@@ -97,7 +101,7 @@ Order: validate → spam checks → Claude → Telegram → reply to the visitor
 ### Tests
 
 - `node scripts/test-lead.js` runs the handler with mocked Claude and Telegram responses and must pass before every commit that touches the form: valid leads in all languages, empty and too-long fields, a bad contact, missing consent, honeypot, too-fast submit, wrong origin, wrong method, Claude timeout, API error, refusal and invalid output, Telegram failure, and HTML in every field.
-- Tests against the real Claude API cost money and run only with Olena's approval.
+- `scripts/live-test-lead.mjs` runs 17 cases against a Preview deployment with the real Claude API and Telegram (spam, prompt injection, other languages, HTML, bots, validation; `--ai-down` checks the fallback). It refuses to run against production, costs a fraction of a cent and runs only with Olena's approval; instructions are in the README.
 
 ### Later (separate stage)
 

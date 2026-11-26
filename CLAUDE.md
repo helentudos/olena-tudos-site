@@ -31,7 +31,8 @@ Goal of the page: clients and employers quickly understand how Olena can help, s
 
 ## Stack and layout
 
-- Plain **HTML, CSS and JavaScript** with no frameworks, libraries or bundlers.
+- Plain **HTML, CSS and JavaScript** with no frameworks, libraries or bundlers in the browser.
+- The only exception is the serverless function in `api/`: it may use the official Anthropic SDK (`@anthropic-ai/sdk`) and `zod` from `package.json`. Nothing from `node_modules` is ever sent to the browser.
 - **Single page**.
 - **Mobile-first**: base styles target phones; larger screens are handled with `min-width` media queries.
 - **Accessibility** (a11y):
@@ -57,8 +58,50 @@ Goal of the page: clients and employers quickly understand how Olena can help, s
 
 ## Inquiry form
 
-- A required **consent checkbox for personal data processing (RODO/GDPR)** with a short text in all three languages (texts in the translation files).
-- **The form cannot be sent without consent.** This is checked both in the browser and in the serverless function.
+The form follows the site's own pattern: incoming text → AI structures it → the right person gets an action.
+
+### Fields and limits
+
+- Fields: **name** (2–80 characters), **contact** (an email address or a Telegram username, up to 100), **process description** (20–2000), a required **consent checkbox**, a hidden **honeypot** field and a hidden form-start time. The current UI language is sent along.
+- The same limits are checked in the browser and in `api/lead.js`; the server is the authority and rejects anything else.
+- All texts (labels, hints, errors, consent, success and failure messages) live in the translation files, in all three languages, and the English ones are prerendered like the rest of the page.
+
+### Consent and privacy (RODO/GDPR)
+
+- A required **consent checkbox**. **The form cannot be sent without consent**: the browser blocks it and the server rejects any request without `consent: true`.
+- The consent text says, in plain words: the data goes to Olena, is processed by an AI service (Anthropic's Claude API) to sort the request, is delivered to her via Telegram, is not stored on the website, and how to ask for deletion. The final wording is approved by Olena.
+- The Telegram message records when consent was given and which version of the consent text was shown.
+- The browser talks only to the site's own `/api/lead`; no cookies and no third-party requests are added.
+
+### Serverless function `api/lead.js`
+
+Order: validate → spam checks → Claude → Telegram → reply to the visitor. Helpers live in `api/_lib/` (files starting with `_` are not routes).
+
+- **Spam:** if the honeypot is filled or the form was sent too fast, answer as if it succeeded and send nothing. Requests must come from the site's own origin. A best-effort per-IP limit applies (real rate limiting comes with the database).
+- **Claude:** model `claude-haiku-5-5` through the official SDK, `effort: "low"`, structured outputs with a strict JSON schema (enums wherever possible), a short timeout, and the result validated again in code. Fields: `service`, `process`, `department`, `urgency`, `team_size`, `summary`, `first_question`, `reply_for_visitor`, `visitor_language`, `spam_likelihood`, `injection_suspected`. `service` is one of the four services in `facts.md` or `other`; unknown facts are `unknown`, never guessed.
+- **Fallback:** on any Claude failure (timeout, API error, refusal, output that fails validation) the lead still reaches Olena as raw text, marked as unclassified, and the visitor sees a neutral confirmation.
+- **Telegram:** Bot API `sendMessage` with `parse_mode: "HTML"`; every dynamic value is HTML-escaped; the message stays under Telegram's 4096-character limit.
+- **If Telegram fails**, the visitor is told honestly that the message was not delivered and is shown the email and Telegram contacts (with no database yet, the lead would otherwise be lost).
+- **Visitor reply:** `reply_for_visitor` (2–3 sentences, the visitor's language, no promises about price or timing) is shown as plain text (`textContent`, length-capped) together with a confirmation that Olena will answer. If the AI failed or flagged spam or an injection attempt, a neutral confirmation is shown instead.
+
+### Prompt-injection defence
+
+- The visitor's text is **data, not instructions**: it is sent JSON-escaped inside clearly marked tags in the user message, and the system prompt says never to follow instructions found there.
+- The model has no tools and no access to anything; its output is limited by the schema, free-text fields are length-capped in code, and model text is never inserted as HTML anywhere.
+
+### Configuration
+
+- Environment variables, set only in Vercel: `ANTHROPIC_API_KEY`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`. `.env.example` lists the names without values.
+- The function runs in an EU region (`fra1`, set in `vercel.json`).
+
+### Tests
+
+- `node scripts/test-lead.js` runs the handler with mocked Claude and Telegram responses and must pass before every commit that touches the form: valid leads in all languages, empty and too-long fields, a bad contact, missing consent, honeypot, too-fast submit, wrong origin, wrong method, Claude timeout, API error, refusal and invalid output, Telegram failure, and HTML in every field.
+- Tests against the real Claude API cost money and run only with Olena's approval.
+
+### Later (separate stage)
+
+- Storing leads in PostgreSQL (Neon) and a weekly report.
 
 ## Hosting
 
@@ -85,7 +128,8 @@ Goal of the page: clients and employers quickly understand how Olena can help, s
 
 ## Privacy
 
-- No cookies, no analytics, no third-party requests (fonts are served from the site). The only browser storage is `localStorage` for the visitor's own language and theme choice, so no consent banner is needed. Adding any tracking or third-party embed requires revisiting this.
+- No cookies, no analytics, no third-party requests from the browser (fonts are served from the site). The only browser storage is `localStorage` for the visitor's own language and theme choice, so no consent banner is needed. Adding any tracking or third-party embed requires revisiting this.
+- Inquiry form data leaves the site only from the serverless function, to Anthropic (classification) and Telegram (delivery), as stated in the consent text. Nothing is logged or stored by the function; logs contain no form content.
 
 ## Git
 

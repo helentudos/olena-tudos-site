@@ -8,6 +8,7 @@
  */
 
 const { z } = require('zod');
+const Anthropic = require('@anthropic-ai/sdk').default;
 const { zodOutputFormat } = require('@anthropic-ai/sdk/helpers/zod');
 
 const MODEL = 'claude-haiku-5-5';
@@ -95,9 +96,14 @@ async function classifyLead(lead, { client }) {
       output_config: { effort: 'low', format: zodOutputFormat(LeadClassification) },
     });
   } catch (error) {
-    // Typed SDK errors carry a status; never log the visitor's text.
-    const status = error && error.status ? ` ${error.status}` : '';
-    return { ok: false, reason: `api_error:${(error && error.name) || 'Error'}${status}` };
+    // Never log or forward the visitor's text here, only the kind of failure.
+    if (error instanceof Anthropic.APIError) {
+      const status = error.status ? ` ${error.status}` : '';
+      return { ok: false, reason: `api_error:${error.name}${status}` };
+    }
+    // The SDK throws a plain AnthropicError when the output fails JSON or schema parsing
+    if (error instanceof Anthropic.AnthropicError) return { ok: false, reason: 'invalid_output' };
+    return { ok: false, reason: `error:${(error && error.name) || 'Error'}` };
   }
 
   if (!response || response.stop_reason === 'refusal') return { ok: false, reason: 'refusal' };

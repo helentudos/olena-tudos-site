@@ -18,7 +18,7 @@ const ORIGIN = 'https://olena-tudos-site.vercel.app';
 const ENV = { TELEGRAM_BOT_TOKEN: 'test-token', TELEGRAM_CHAT_ID: '42' };
 
 const GOOD = {
-  service: 'incoming_requests', process: 'Email inquiries', department: 'sales', urgency: 'high',
+  service: 'incoming_requests', process: 'обробка заявок з пошти', department: 'sales', urgency: 'high',
   team_size: '11-50', summary: 'Заявки з пошти губляться.', first_question: 'How many emails a day?',
   reply_for_visitor: 'Thank you, I understand that inquiries from email get lost. Olena will reply personally.',
   visitor_language: 'en', spam_likelihood: 'low', injection_suspected: false,
@@ -269,6 +269,92 @@ test('textMatchesLanguage: scripts and language-specific letters', () => {
   assert.equal(m('Дякую! Олена відповість.', 'ru'), false);
   assert.equal(m('', 'en'), false);
   assert.equal(m('anything at all', 'other'), true);
+});
+
+// ---------- process and summary must be Ukrainian: one retry (live test 3) ----------
+
+const LIVE_TEST_3 = {
+  ...GOOD, visitor_language: 'pl', process: 'obsługa zgłoszeń klientów',
+  summary: 'Firма montażowa, ок. 15 людей: заявки клієнтів губляться.',
+  first_question: 'Ile zgłoszeń wpływa tygodniowo?', reply_for_visitor: 'Dziękuję za opis. Olena odpowie osobiście.',
+};
+const FIXED = { ...LIVE_TEST_3, process: 'обробка заявок клієнтів з email і WhatsApp', summary: 'Монтажна фірма, ~15 людей: заявки клієнтів губляться.' };
+/** Claude mock that answers with the given results in turn. */
+const claudeSequence = (...results) => {
+  let i = 0;
+  return claudeMock(() => {
+    const next = results[Math.min(i++, results.length - 1)];
+    return next instanceof Response ? next : message(JSON.stringify(next));
+  });
+};
+
+test('Ukrainian process and summary on the first try: no retry', async () => {
+  const r = await run(lead(), { claude: claudeSequence(FIXED) });
+  assert.equal(r.claude.calls.length, 1);
+  assert.ok(!r.claude.calls[0].system.includes('Correction:'));
+});
+
+test('Polish process and mixed summary (live test 3): one retry fixes it', async () => {
+  const r = await run(lead(), { claude: claudeSequence(LIVE_TEST_3, FIXED), env: { ...ENV, VERCEL_ENV: 'preview' }, headers: { 'x-lead-debug': '1' } });
+  assert.equal(r.claude.calls.length, 2);
+  const correction = r.claude.calls[1].system;
+  assert.match(correction, /Correction: a previous answer to this same inquiry broke the language rule for process: it contained Polish words/);
+  assert.ok(!correction.includes('obsługa') && !correction.includes('Firма'), 'no model or visitor text in the system prompt');
+  assert.equal(r.body.reply, FIXED.reply_for_visitor);
+  assert.equal(r.body.debug.classification.retried, true);
+  const text = r.telegram.calls[0].body.text;
+  assert.ok(text.startsWith('🆕 <b>Нова заявка</b>'), 'no warning after a successful retry');
+  assert.match(text, /• Процес: обробка заявок клієнтів з email і WhatsApp/);
+});
+
+test('still not Ukrainian after the retry: sent as is with ⚠️, only one retry', async () => {
+  const r = await run(lead(), { claude: claudeSequence(LIVE_TEST_3, LIVE_TEST_3, FIXED) });
+  assert.equal(r.claude.calls.length, 2);
+  const text = r.telegram.calls[0].body.text;
+  assert.equal(text.split('\n')[0], '⚠️ <b>summary не українською</b>: process — польські літери (і після повторного запиту)');
+  assert.match(text, /• Процес: obsługa zgłoszeń клієнтів|• Процес: obsługa zgłoszeń klientów/);
+  assert.equal(r.body.reply, LIVE_TEST_3.reply_for_visitor, 'the visitor reply is not affected');
+});
+
+test('mixed Latin and Cyrillic in summary triggers the retry', async () => {
+  const mixed = { ...FIXED, summary: 'Firма montazowa, ок. 15 людей: заявки клієнтів губляться.' };
+  const r = await run(lead(), { claude: claudeSequence(mixed, mixed) });
+  assert.equal(r.claude.calls.length, 2);
+  assert.match(r.claude.calls[1].system, /for summary: it mixed Latin and Cyrillic letters inside words/);
+  assert.match(r.telegram.calls[0].body.text, /summary — латиниця й кирилиця в одному слові/);
+});
+
+test('retry request fails: first answer is kept and Olena is warned', async () => {
+  const r = await run(lead(), { claude: claudeSequence(LIVE_TEST_3, apiError(529, 'overloaded_error')) });
+  assert.equal(r.status, 200);
+  assert.match(r.telegram.calls[0].body.text.split('\n')[0], /повторний запит не вдався/);
+});
+
+test('no time left for the retry: skipped, Olena is warned', async () => {
+  const { classifyLead, RETRY_BUDGET_MS } = require('../api/_lib/classify');
+  const times = [0, RETRY_BUDGET_MS + 1];
+  const claude = claudeSequence(LIVE_TEST_3, FIXED);
+  const out = await classifyLead({ uiLanguage: 'en', name: 'A', contact: { value: 'a@b.co' }, description: 'x'.repeat(30) },
+    { client: claude.client, now: () => times.shift() ?? RETRY_BUDGET_MS + 1 });
+  assert.equal(claude.calls.length, 1);
+  assert.equal(out.result.retry_skipped, 'time');
+  assert.equal(out.result.olena_language_problem.code, 'polish_letters');
+});
+
+test('olenaTextProblem: what counts as Ukrainian for Olena', () => {
+  const { olenaTextProblem: p } = require('../api/_lib/language');
+  const code = (t, o) => (p(t, o) || { code: null }).code;
+  assert.equal(code('Firма montażowa, ок. 15 людей'), 'polish_letters');
+  assert.equal(code('Firма montazowa, ок. 15 людей'), 'mixed_script');
+  assert.equal(code('obsluga zgloszen klientow'), 'no_cyrillic');
+  assert.equal(code('обробка заявок клієнтів з email і WhatsApp'), null, 'tool names are allowed');
+  assert.equal(code('перенесення даних у CRM через n8n і GPT-4o'), null);
+  assert.equal(code('обробка заявок, які надходять mailem і telefonicznie щодня'), 'low_cyrillic');
+  assert.equal(code('Монтажная фирма, заявки теряются, всё вручную'), 'russian_letters');
+  // Known limit: Russian without ы, э, ъ, ё is not detected
+  assert.equal(code('Монтажная фирма, заявки теряются'), null);
+  assert.equal(code('Монтажна фірма, ~15 людей: заявки з пошти й WhatsApp переносять в Excel.', { requireUkrainianLetter: true }), null);
+  assert.equal(code(''), 'empty');
 });
 
 // ---------- Claude failures: lead still reaches Olena as raw text ----------

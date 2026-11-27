@@ -9,7 +9,7 @@
 
 const { z } = require('zod');
 const Anthropic = require('@anthropic-ai/sdk').default;
-const { textMatchesLanguage } = require('./language');
+const { textMatchesLanguage, olenaFieldsProblem } = require('./language');
 const { zodOutputFormat } = require('@anthropic-ai/sdk/helpers/zod');
 
 const MODEL = 'claude-haiku-5-5';
@@ -105,21 +105,41 @@ function replyLooksUnsafe(reply) {
   return /(https?:\/\/|www\.|[\w.+-]+@[\w-]+\.[\w.]+|<\/?[a-z]|t\.me\/)/i.test(reply);
 }
 
+// One retry when process or summary are not in Ukrainian (live test 3). The retry is
+// skipped if the first answer took too long: the function must finish within 30 s
+// (first call up to ~20 s with its own retry, the retry up to 8 s, Telegram up to 5 s).
+const RETRY_BUDGET_MS = 14000;
+const RETRY_OPTIONS = { timeout: 8000, maxRetries: 0 };
+
 /**
- * @param {object} lead       validated lead from validate.js
- * @param {object} deps       { client } - an Anthropic client (mocked in tests)
- * @returns {Promise<{ok: true, result: object} | {ok: false, reason: string}>}
+ * Correction for the retry. Built only from fixed codes, never from model or visitor
+ * text, because it goes into the system prompt.
  */
-async function classifyLead(lead, { client }) {
+const PROBLEM_TEXT = {
+  empty: 'it was empty',
+  polish_letters: 'it contained Polish words',
+  mixed_script: 'it mixed Latin and Cyrillic letters inside words',
+  no_cyrillic: 'it was not written in Ukrainian',
+  low_cyrillic: 'large parts of it were not in Ukrainian',
+  russian_letters: 'it contained Russian words',
+  no_ukrainian_letters: 'it did not look like Ukrainian',
+};
+function correctionFor(problem) {
+  const field = problem.field === 'summary' ? 'summary' : 'process';
+  return `\n\nCorrection: a previous answer to this same inquiry broke the language rule for ${field}: ${PROBLEM_TEXT[problem.code] || 'it was not in Ukrainian'}. Write process and summary entirely in Ukrainian with Cyrillic letters: translate every word, never copy, transliterate or mix in the visitor's words. Only tool names such as Excel or WhatsApp stay in Latin letters. Keep first_question and reply_for_visitor in the visitor_language.`;
+}
+
+/** One request to Claude. Returns { ok: true, result } or { ok: false, reason }. */
+async function requestClassification(lead, client, correction, options) {
   let response;
   try {
     response = await client.messages.parse({
       model: MODEL,
       max_tokens: 2000,
-      system: SYSTEM_PROMPT,
+      system: SYSTEM_PROMPT + (correction || ''),
       messages: [{ role: 'user', content: buildUserMessage(lead) }],
       output_config: { effort: 'low', format: zodOutputFormat(LeadClassification) },
-    });
+    }, options);
   } catch (error) {
     // Never log or forward the visitor's text here, only the kind of failure.
     if (error instanceof Anthropic.APIError) {
@@ -136,9 +156,39 @@ async function classifyLead(lead, { client }) {
 
   const checked = LeadClassification.safeParse(response.parsed_output);
   if (!checked.success) return { ok: false, reason: 'invalid_output' };
-
   const result = { ...checked.data };
   for (const [field, max] of Object.entries(TEXT_LIMITS)) result[field] = capText(result[field], max);
+  return { ok: true, result };
+}
+
+/**
+ * @param {object} lead       validated lead from validate.js
+ * @param {object} deps       { client, now } - an Anthropic client (mocked in tests), a clock
+ * @returns {Promise<{ok: true, result: object} | {ok: false, reason: string}>}
+ */
+async function classifyLead(lead, { client, now = Date.now }) {
+  const started = now();
+  const first = await requestClassification(lead, client, null);
+  if (!first.ok) return first;
+
+  let result = first.result;
+  let problem = olenaFieldsProblem(result);
+  if (problem) {
+    if (now() - started < RETRY_BUDGET_MS) {
+      const second = await requestClassification(lead, client, correctionFor(problem), RETRY_OPTIONS);
+      if (second.ok) {
+        result = { ...second.result, retried: true };
+        problem = olenaFieldsProblem(result);
+      } else {
+        result = { ...result, retried: true, retry_failed: second.reason };
+      }
+    } else {
+      result = { ...result, retry_skipped: 'time' };
+    }
+    // Still not Ukrainian: the lead goes to Olena as it is, with a warning
+    if (problem) result.olena_language_problem = problem;
+  }
+
   if (!result.reply_for_visitor || replyLooksUnsafe(result.reply_for_visitor)) {
     result.reply_for_visitor = '';
     result.reply_blocked = true;
@@ -159,5 +209,7 @@ module.exports = {
   LeadClassification,
   buildUserMessage,
   classifyLead,
+  correctionFor,
+  RETRY_BUDGET_MS,
   replyLooksUnsafe,
 };

@@ -23,6 +23,15 @@ const DEPARTMENT_LABELS = {
 const URGENCY_LABELS = { low: 'низька', medium: 'середня', high: 'висока', unknown: 'не вказано' };
 const LANGUAGE_LABELS = { en: 'EN', pl: 'PL', uk: 'UA', ru: 'RU', other: 'інша' };
 const TRUNCATED = '… [обрізано]';
+const OLENA_PROBLEM_LABELS = {
+  empty: 'порожньо',
+  polish_letters: 'польські літери',
+  mixed_script: 'латиниця й кирилиця в одному слові',
+  no_cyrillic: 'немає українського тексту',
+  low_cyrillic: 'замало кирилиці',
+  russian_letters: 'російські літери',
+  no_ukrainian_letters: 'немає українських літер',
+};
 
 /** Escapes text for Telegram HTML (also safe inside attribute values). */
 function escapeHtml(value) {
@@ -62,6 +71,11 @@ function formatMessage(lead, classification, meta) {
   if (meta.flags.injection) warnings.push('⚠️ <b>Можлива спроба prompt injection</b>');
   if (meta.flags.spam) warnings.push('⚠️ <b>Можливий спам</b>');
   if (r && r.reply_blocked) warnings.push('⚠️ Автовідповідь відвідувачу заблоковано: в ній були посилання або контакти');
+  if (r && r.olena_language_problem) {
+    const why = OLENA_PROBLEM_LABELS[r.olena_language_problem.code] || 'не українською';
+    const retry = r.retry_skipped ? 'повтор пропущено: не вистачило часу' : r.retry_failed ? 'повторний запит не вдався' : 'і після повторного запиту';
+    warnings.push(`⚠️ <b>summary не українською</b>: ${escapeHtml(r.olena_language_problem.field)} — ${why} (${retry})`);
+  }
   if (r && r.reply_language_mismatch) warnings.push('⚠️ Мова автовідповіді не збіглася з мовою заявки: відвідувач побачив нейтральне підтвердження');
 
   const head = [

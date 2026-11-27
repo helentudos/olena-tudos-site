@@ -58,7 +58,7 @@ async function handleLead(req, deps) {
   const lead = checked.lead;
 
   const classification = deps.client
-    ? await classifyLead(lead, { client: deps.client })
+    ? await classifyLead(lead, { client: deps.client, now: deps.now })
     : { ok: false, reason: 'not_configured' };
   if (!classification.ok) console.error('[lead] classification failed:', classification.reason);
 

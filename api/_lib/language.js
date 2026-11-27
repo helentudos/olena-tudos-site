@@ -9,10 +9,18 @@
  *   uk      mostly Cyrillic, has a Ukrainian-only letter (і ї є ґ), no Russian-only letters
  *   ru      mostly Cyrillic, no Ukrainian-only letters
  *   other   cannot be checked by script: accepted
+ *
+ * olenaTextProblem() is stricter: process and summary are written for Olena and
+ * must be Ukrainian (live tests 1 and 3 found Polish and mixed Latin/Cyrillic text).
  */
 
 const UKRAINIAN_ONLY = /[іїєґ]/i;
 const RUSSIAN_ONLY = /[ыэъё]/i;
+const POLISH_LETTERS = /[ąćęłńóśźż]/i;
+// Latin words that may appear in Ukrainian text for Olena besides capitalised or
+// all-caps names (Excel, WhatsApp, CRM) and words with digits (n8n, GPT-4o)
+const ALLOWED_LATIN_WORDS = new Set(['email', 'e-mail', 'online', 'offline', 'chatbot', 'chat-bot', 'bot', 'workflow', 'webhook', 'api', 'crm', 'erp', 'sla', 'pdf', 'excel']);
+const MIN_CYRILLIC_SHARE = 0.8;
 
 function letterStats(text) {
   const letters = String(text || '').match(/\p{L}/gu) || [];
@@ -38,4 +46,46 @@ function textMatchesLanguage(text, lang) {
   }
 }
 
-module.exports = { textMatchesLanguage, letterStats };
+/**
+ * Returns null when the text is acceptable Ukrainian for Olena, otherwise
+ * { code, detail }. The code is a fixed value, safe to use in a follow-up prompt;
+ * the detail may quote the text and is only for Olena and the tests.
+ */
+function olenaTextProblem(text, { requireUkrainianLetter = false } = {}) {
+  const s = String(text || '').trim();
+  if (!s) return { code: 'empty', detail: 'empty' };
+  if (POLISH_LETTERS.test(s)) return { code: 'polish_letters', detail: 'Polish letters' };
+
+  let cyrillic = 0;
+  let latin = 0;
+  for (const word of s.match(/[\p{L}\p{N}][\p{L}\p{N}'’-]*/gu) || []) {
+    const c = (word.match(/\p{Script=Cyrillic}/gu) || []).length;
+    const l = (word.match(/\p{Script=Latin}/gu) || []).length;
+    if (c && l) return { code: 'mixed_script', detail: `Latin and Cyrillic in one word: "${word}"` };
+    if (l) {
+      const isName = /^[A-Z]/.test(word) || /\d/.test(word) || ALLOWED_LATIN_WORDS.has(word.toLowerCase());
+      if (!isName) latin += l;
+    } else {
+      cyrillic += c;
+    }
+  }
+  if (!cyrillic) return { code: 'no_cyrillic', detail: 'no Ukrainian text' };
+  const share = cyrillic / (cyrillic + latin);
+  if (share < MIN_CYRILLIC_SHARE) return { code: 'low_cyrillic', detail: `only ${Math.round(share * 100)}% Cyrillic` };
+  if (RUSSIAN_ONLY.test(s)) return { code: 'russian_letters', detail: 'Russian-only letters' };
+  if (requireUkrainianLetter && cyrillic >= 25 && !UKRAINIAN_ONLY.test(s)) {
+    return { code: 'no_ukrainian_letters', detail: 'no Ukrainian letters (і, ї, є, ґ)' };
+  }
+  return null;
+}
+
+/** Checks process and summary together; returns null or { field, code, detail }. */
+function olenaFieldsProblem(result) {
+  const process = olenaTextProblem(result.process);
+  if (process) return { field: 'process', ...process };
+  const summary = olenaTextProblem(result.summary, { requireUkrainianLetter: true });
+  if (summary) return { field: 'summary', ...summary };
+  return null;
+}
+
+module.exports = { textMatchesLanguage, letterStats, olenaTextProblem, olenaFieldsProblem };

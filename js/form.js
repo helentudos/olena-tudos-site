@@ -119,7 +119,7 @@
     var willReply = document.getElementById('lead-will-reply');
     if (data.reply) {
       replyText.textContent = data.reply; // plain text only, never HTML
-      if (['en', 'pl', 'uk'].indexOf(data.replyLanguage) !== -1) replyText.lang = data.replyLanguage;
+      if (['en', 'pl', 'uk', 'ru'].indexOf(data.replyLanguage) !== -1) replyText.lang = data.replyLanguage;
       else replyText.removeAttribute('lang');
       replyBox.hidden = false;
       willReply.hidden = true;

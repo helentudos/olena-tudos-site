@@ -17,7 +17,7 @@ const SERVICES = ['incoming_requests', 'voice_documents', 'internal_requests', '
 const DEPARTMENTS = ['sales', 'marketing', 'customer_support', 'operations', 'hr', 'it', 'procurement', 'finance', 'management', 'other', 'unknown'];
 const URGENCY = ['low', 'medium', 'high', 'unknown'];
 const TEAM_SIZES = ['1', '2-10', '11-50', '51-250', '250+', 'unknown'];
-const LANGUAGES = ['en', 'pl', 'uk', 'other'];
+const LANGUAGES = ['en', 'pl', 'uk', 'ru', 'other'];
 const SPAM = ['low', 'medium', 'high'];
 
 const LeadClassification = z.object({

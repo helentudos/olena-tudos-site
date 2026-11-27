@@ -12,7 +12,7 @@ const LIMITS = {
 const MIN_FILL_MS = 3000; // faster than this is treated as a bot
 const MAX_BODY_CHARS = 10000;
 const CONSENT_VERSIONS = ['v1'];
-const UI_LANGUAGES = ['en', 'pl', 'uk'];
+const UI_LANGUAGES = ['en', 'pl', 'uk', 'ru'];
 
 const EMAIL_RE = /^[^\s@<>()",;:]+@[^\s@<>()",;:]+\.[^\s@<>()",;:]{2,}$/;
 const TELEGRAM_RE = /^@?[A-Za-z0-9_]{5,32}$/;

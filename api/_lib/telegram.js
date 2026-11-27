@@ -21,7 +21,7 @@ const DEPARTMENT_LABELS = {
   other: 'інше', unknown: 'не вказано',
 };
 const URGENCY_LABELS = { low: 'низька', medium: 'середня', high: 'висока', unknown: 'не вказано' };
-const LANGUAGE_LABELS = { en: 'en', pl: 'pl', uk: 'uk', other: 'інша' };
+const LANGUAGE_LABELS = { en: 'en', pl: 'pl', uk: 'uk', ru: 'ru', other: 'інша' };
 
 function escapeHtml(value) {
   return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');

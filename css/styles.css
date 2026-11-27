@@ -1239,7 +1239,11 @@ main:focus { outline: none; }
     radial-gradient(520px 380px at 5% 100%, rgba(91, 33, 182, 0.5), transparent 70%),
     linear-gradient(180deg, #120c26, #1a1036);
 }
-[data-theme="dark"] .hero-art { filter: drop-shadow(0 30px 60px rgba(0, 0, 0, 0.45)); }
+/* Desktop only, as in the light theme: a filter over the animated SVG makes phones
+   repaint the shadow on every frame, which shows up as flicker */
+@media (min-width: 960px) {
+  [data-theme="dark"] .hero-art { filter: drop-shadow(0 30px 60px rgba(0, 0, 0, 0.45)); }
+}
 [data-theme="dark"] .s-flow { stroke: #c4b5fd; }
 
 [data-theme="dark"] .section-alt {

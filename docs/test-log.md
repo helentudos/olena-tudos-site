@@ -2,6 +2,27 @@
 
 Live tests of the inquiry form run against a Vercel **Preview** deployment with the real Claude API and Telegram (`scripts/live-test-lead.mjs`, see the README). Each entry records what was tested, what was found and what changed. Newest first.
 
+## Live test 7 — 16/17; name guard false positive („alerts“) — narrowed; first-person voice with mixed gender found manually — removed; language check correctly caught „коротký“ and the retry fixed it
+
+- **Date:** 2026-11-28
+- **Where:** a new Preview deployment of `claude/create-claude-md-rules-fgkppd`, all 17 cases, run by Olena from the current branch
+
+**Confirmed:** names and the closing sentence are fixed (`valid-ru` ends with «Елена ответит лично.»). The Ukrainian check worked as intended on `inj-tag`: the mixed word «коротký» (Cyrillic and Latin letters) triggered the retry, and the retry fixed it.
+
+**`html-emoji` FAIL — false positive of the name guard:** the word "alerts" was treated as a name. The actual cause: the visitor's name in this case is HTML, `<b>Bold</b> & <script>alert(1)</script>`; "alert" became one of the "name" parts, and "alerts" matched it as a declined form. The rule "an unknown capitalised word in the middle of a sentence is a name" was also too strict for English.
+
+**Fix:** the name guard is narrowed to three things only: the visitor's own name, matched only against capitalised words (also declined: Piotr → Piotrze, Анна → Анно); a list of frequent first names (en, pl, uk, ru); and any variant or misspelling of Olena's name (Ольга, Olga, Olha, Helena, Elena, Alona, Альона, Алёна, Lena…). Capitalised words on their own are no longer blocked. A sentence with Olena's correct name (Olena, Олена, Елена) is still removed as the model's own closing; misspellings are now blocked instead of being removed silently.
+
+**New issue, found manually — first person with mixed gender:** the reply was written in the first person with a gendered verb («Я зрозуміла», «Я понял»), and then the closing said «Олена відповість» in the third person. The prompt's own examples used the first person ("I understand", "Rozumiem").
+
+**Fix:** the prompt now asks for an impersonal reply: no first person and no gendered verbs, only a short thanks, with suggested openings (en "Thanks for the description: …", pl "Dziękuję za opis. Z opisu wynika, że …", uk "Дякую за опис. Зрозуміло, що …", ru "Спасибо за описание. Ясно, что …"); the examples were rewritten. The live tests now fail a reply with the first person (I, my, Rozumiem, я, зрозуміла, понял…).
+
+**Tests:** `scripts/test-lead.js` (94 tests) covers the `html-emoji` reply with the HTML name, capitalised words, each listed variant of Olena's name and a declined visitor name; with the previous guard, 4 of the new tests fail. A test also checks that no prompt example uses the first person. The live test script prints `live test 7: narrower name guard, no first person` as its checks version; a dry run catches «Я понял».
+
+**Known limit:** first person is checked only in the live tests, not on the server; a rare first name that is not in the list and is not the visitor's own is not caught.
+
+**Status:** fixed; to be confirmed by live test 8.
+
 ## Live test 6 — 16/17; spam FAIL from an outdated local script; new bug found manually: wrong name „Ольга“ in the Russian reply and missing closing sentence — fixed by moving the closing sentence to code
 
 - **Date:** 2026-11-28

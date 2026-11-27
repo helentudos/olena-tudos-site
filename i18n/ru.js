@@ -202,7 +202,6 @@ window.I18N.ru = {
   "form.sending": "Отправляю…",
   "form.thanks": "Спасибо! Заявка отправлена.",
   "form.willReply": "Елена ответит лично на указанный контакт.",
-  "form.autoLabel": "Автоматический ответ · Елена ответит лично",
   "form.error.nameShort": "Укажите имя (не менее 2 символов).",
   "form.error.nameLong": "Имя слишком длинное (до 80 символов).",
   "form.error.contactInvalid": "Укажите email или имя пользователя в Telegram (5–32 буквы, цифры или _).",

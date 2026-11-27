@@ -202,7 +202,6 @@ window.I18N.en = {
   "form.sending": "Sending…",
   "form.thanks": "Thank you! Your inquiry has been sent.",
   "form.willReply": "Olena will reply personally to the contact you provided.",
-  "form.autoLabel": "Automatic reply · Olena will reply personally",
   "form.error.nameShort": "Please enter your name (at least 2 characters).",
   "form.error.nameLong": "The name is too long (up to 80 characters).",
   "form.error.contactInvalid": "Enter an email address or a Telegram username (5–32 letters, digits or _).",

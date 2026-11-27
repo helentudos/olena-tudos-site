@@ -202,7 +202,6 @@ window.I18N.pl = {
   "form.sending": "Wysyłanie…",
   "form.thanks": "Dziękuję! Zapytanie zostało wysłane.",
   "form.willReply": "Olena odpowie osobiście na podany kontakt.",
-  "form.autoLabel": "Odpowiedź automatyczna · Olena odpowie osobiście",
   "form.error.nameShort": "Podaj imię (co najmniej 2 znaki).",
   "form.error.nameLong": "Imię jest za długie (maksymalnie 80 znaków).",
   "form.error.contactInvalid": "Podaj adres e-mail lub nazwę użytkownika w Telegramie (5–32 litery, cyfry lub _).",

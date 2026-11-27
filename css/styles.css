@@ -1014,7 +1014,6 @@ main:focus { outline: none; }
   background: var(--accent-soft);
 }
 .lead-reply-text { white-space: pre-line; }
-.lead-reply-label { margin-top: 8px; color: var(--muted); font-size: 0.8rem; font-weight: 600; }
 
 .contacts-title { font-size: 1.1rem; margin-bottom: 14px; }
 

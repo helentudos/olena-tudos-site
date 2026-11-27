@@ -8,7 +8,7 @@ const path = require('path');
 const vm = require('vm');
 
 const root = path.join(__dirname, '..');
-const langs = ['uk', 'pl', 'en'];
+const langs = ['en', 'pl', 'uk', 'ru'];
 const sandbox = { window: {} };
 vm.createContext(sandbox);
 for (const lang of langs) {

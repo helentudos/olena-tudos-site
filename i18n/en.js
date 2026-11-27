@@ -21,9 +21,11 @@ window.I18N.en = {
   "lang.uk": "Українська",
   "lang.pl": "Polski",
   "lang.en": "English",
+  "lang.ru": "Русский",
   "lang.ukShort": "UA",
   "lang.plShort": "PL",
   "lang.enShort": "EN",
+  "lang.ruShort": "RU",
 
   "theme.dark": "Dark theme",
 

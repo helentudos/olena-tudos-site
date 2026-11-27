@@ -2,6 +2,21 @@
 
 Live tests of the inquiry form run against a Vercel **Preview** deployment with the real Claude API and Telegram (`scripts/live-test-lead.mjs`, see the README). Each entry records what was tested, what was found and what changed. Newest first.
 
+## Live test 8 — 17/17, all fixes confirmed
+
+- **Date:** 2026-11-28
+- **Where:** a new Preview deployment of `claude/create-claude-md-rules-fgkppd`, all 17 cases, run by Olena from the current branch (checks version "live test 7: narrower name guard, no first person")
+- **Result:** 17 PASS, 0 FAIL.
+
+**Confirmed:**
+
+- `process` and `summary` in Ukrainian; `first_question` and the visitor reply in the visitor's language (fixes from live tests 1–3).
+- Visitor replies are impersonal, contain no names, and end with exactly one closing sentence in the right language, for example «Елена ответит лично.» (live tests 6–7).
+- No false positives from the Ukrainian check or the name guard (live tests 5 and 7).
+- Spam and all three prompt-injection attempts were recognised; the visitor saw the neutral confirmation, and the leads reached Olena with ⚠️.
+
+**Status:** the inquiry form is ready to be merged into `main`.
+
 ## Live test 7 — 16/17; name guard false positive („alerts“) — narrowed; first-person voice with mixed gender found manually — removed; language check correctly caught „коротký“ and the retry fixed it
 
 - **Date:** 2026-11-28

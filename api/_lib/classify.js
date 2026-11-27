@@ -10,6 +10,7 @@
 const { z } = require('zod');
 const Anthropic = require('@anthropic-ai/sdk').default;
 const { textMatchesLanguage, olenaFieldsProblem } = require('./language');
+const { stripOwnClosing, findNameLike, withClosing } = require('./reply');
 const { zodOutputFormat } = require('@anthropic-ai/sdk/helpers/zod');
 
 const MODEL = 'claude-haiku-5-5';
@@ -41,7 +42,8 @@ const LeadClassification = z.object({
 });
 
 // Free-text fields are capped in code: the API schema cannot limit string length.
-const TEXT_LIMITS = { process: 120, summary: 400, first_question: 250, reply_for_visitor: 600 };
+// reply_for_visitor leaves room for the closing sentence added in code
+const TEXT_LIMITS = { process: 120, summary: 400, first_question: 250, reply_for_visitor: 560 };
 
 const SYSTEM_PROMPT = `You classify inquiries sent through the contact form on the website of Olena Tudos, an AI Automation Specialist who automates internal business processes for small and medium-sized businesses with n8n, PostgreSQL and LLM APIs.
 
@@ -191,15 +193,27 @@ async function classifyLead(lead, { client, now = Date.now }) {
     if (problem) result.olena_language_problem = problem;
   }
 
-  if (!result.reply_for_visitor || replyLooksUnsafe(result.reply_for_visitor)) {
+  // The visitor reply (live test 6): the model's sentences without any closing
+  // sentence about Olena; the fixed closing is added below in the reply language.
+  const original = result.reply_for_visitor;
+  const modelReply = stripOwnClosing(original);
+  if (modelReply !== String(original).trim()) result.reply_own_closing_removed = true;
+  const hide = (flag, extra = {}) => {
+    // Hidden replies are kept for the Preview debug output only
+    Object.assign(result, { reply_rejected: original, reply_for_visitor: '', [flag]: true }, extra);
+  };
+
+  if (!modelReply || replyLooksUnsafe(modelReply)) {
     result.reply_for_visitor = '';
     result.reply_blocked = true;
-  } else if (!textMatchesLanguage(result.reply_for_visitor, result.visitor_language)) {
-    // The visitor must never get a reply in another language (live test 2):
-    // hide it, keep it for debugging on Preview, and warn Olena.
-    result.reply_rejected = result.reply_for_visitor;
-    result.reply_for_visitor = '';
-    result.reply_language_mismatch = true;
+  } else if (!textMatchesLanguage(modelReply, result.visitor_language)) {
+    // Never a reply in another language (live test 2)
+    hide('reply_language_mismatch');
+  } else {
+    // Never a name in the reply: the model once wrote "Ольга" instead of Елена
+    const name = findNameLike(modelReply, { lang: result.visitor_language, visitorName: lead.name });
+    if (name) hide('reply_name_found', { reply_name: name });
+    else result.reply_for_visitor = withClosing(modelReply, result.visitor_language);
   }
   return { ok: true, result };
 }

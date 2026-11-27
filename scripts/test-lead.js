@@ -15,12 +15,13 @@ const { handleLead, createRateLimiter } = require('../api/_lib/handle');
 const vercelHandler = require('../api/lead');
 
 const ORIGIN = 'https://olena-tudos-site.vercel.app';
+const SHOWN_GOOD = 'Thank you, I understand that inquiries from email get lost. Olena will reply personally.';
 const ENV = { TELEGRAM_BOT_TOKEN: 'test-token', TELEGRAM_CHAT_ID: '42' };
 
 const GOOD = {
   service: 'incoming_requests', process: 'обробка заявок з пошти', department: 'sales', urgency: 'high',
   team_size: '11-50', summary: 'Заявки з пошти губляться.', first_question: 'How many emails a day?',
-  reply_for_visitor: 'Thank you, I understand that inquiries from email get lost. Olena will reply personally.',
+  reply_for_visitor: 'Thank you, I understand that inquiries from email get lost.',
   visitor_language: 'en', spam_likelihood: 'low', injection_suspected: false,
 };
 
@@ -78,7 +79,7 @@ test('valid inquiry: classified, sent to Telegram, visitor gets the AI reply', a
   const r = await run(lead());
   assert.equal(r.status, 200);
   assert.equal(r.body.ok, true);
-  assert.equal(r.body.reply, GOOD.reply_for_visitor);
+  assert.equal(r.body.reply, SHOWN_GOOD, 'model sentences plus the closing added in code');
   assert.equal(r.telegram.calls.length, 1);
   const tg = r.telegram.calls[0];
   assert.match(tg.url, /\/bottest-token\/sendMessage$/);
@@ -126,9 +127,10 @@ test('request to Claude: model, effort, strict schema, inquiry as escaped JSON',
 
 for (const [lang, contact] of [['pl', '@anna_pl'], ['uk', 'https://t.me/anna_ua'], ['ru', '@anna_ru']]) {
   test(`valid inquiry in ${lang} with a Telegram contact`, async () => {
-    const reply = { pl: 'Dziękuję za opis. Olena odpowie osobiście.', uk: 'Дякую за опис. Олена відповість особисто.', ru: 'Спасибо за описание. Елена ответит лично.' }[lang];
+    const reply = { pl: 'Dziękuję za opis.', uk: 'Дякую за опис.', ru: 'Спасибо за описание.' }[lang];
+    const closing = { pl: 'Olena odpowie osobiście.', uk: 'Олена відповість особисто.', ru: 'Елена ответит лично.' }[lang];
     const r = await run(lead({ ui_language: lang, contact }), { claude: claudeOk({ ...GOOD, visitor_language: lang, reply_for_visitor: reply }) });
-    assert.equal(r.body.reply, reply);
+    assert.equal(r.body.reply, `${reply} ${closing}`);
     assert.equal(r.status, 200);
     assert.equal(r.body.replyLanguage, lang);
     assert.match(r.telegram.calls[0].body.text, /💬 <a href="https:\/\/t\.me\/anna_(pl|ua|ru)">@anna_(pl|ua|ru)<\/a>/);
@@ -246,17 +248,21 @@ test('Ukrainian reply to a Polish inquiry (live test 2): neutral confirmation, �
 });
 
 for (const [visitor, reply, shown] of [
-  ['en', 'Thank you, I understand the problem. Olena will reply personally.', true],
-  ['en', 'Дякую, Олена відповість особисто.', false],
-  ['uk', 'Спасибо, Елена ответит лично.', false],
-  ['ru', 'Дякую, Олена відповість особисто.', false],
-  ['ru', 'Спасибо, Елена ответит лично.', true],
-  ['uk', 'Thank you, Olena will reply personally.', false],
-  ['other', 'Danke für die Beschreibung. Olena antwortet persönlich.', true],
+  ['en', 'Thank you, I understand the problem.', true],
+  ['en', 'Дякую, я зрозуміла проблему.', false],
+  ['uk', 'Спасибо, я поняла проблему.', false],
+  ['uk', 'Спасибо за описание.', false],
+  ['ru', 'Дякую, я зрозуміла проблему.', false],
+  ['ru', 'Дякую за опис.', false],
+  ['ru', 'Спасибо, я поняла проблему.', true],
+  ['uk', 'Дякую за опис.', true],
+  ['uk', 'Thank you, I understand the problem.', false],
+  ['other', 'Danke für die Beschreibung, ich verstehe das Problem.', true],
 ]) {
   test(`reply language guard: ${visitor} visitor, reply "${reply.slice(0, 22)}…" ${shown ? 'shown' : 'hidden'}`, async () => {
     const r = await run(lead(), { claude: claudeOk({ ...GOOD, visitor_language: visitor, reply_for_visitor: reply }) });
-    assert.equal(r.body.reply, shown ? reply : null);
+    const closing = { en: 'Olena will reply personally.', uk: 'Олена відповість особисто.', ru: 'Елена ответит лично.' }[visitor] || 'Olena will reply personally.';
+    assert.equal(r.body.reply, shown ? `${reply} ${closing}` : null);
     assert.equal(/Мова автовідповіді не збіглася/.test(r.telegram.calls[0].body.text), !shown);
   });
 }
@@ -274,12 +280,68 @@ test('textMatchesLanguage: scripts and language-specific letters', () => {
   assert.equal(m('anything at all', 'other'), true);
 });
 
+// ---------- names and the closing sentence (live test 6) ----------
+
+const CLOSING = { en: 'Olena will reply personally.', pl: 'Olena odpowie osobiście.', uk: 'Олена відповість особисто.', ru: 'Елена ответит лично.' };
+
+test('closing sentences are exactly the agreed texts; "other" gets English', () => {
+  const { CLOSINGS, closingFor } = require('../api/_lib/reply');
+  assert.deepEqual(CLOSINGS, CLOSING);
+  assert.equal(closingFor('other'), CLOSING.en);
+});
+
+test('wrong name in the Russian reply (live test 6): hidden, ⚠️ to Olena', async () => {
+  const ru = 'Спасибо за описание. Понимаю, что голосовые отчёты переписываются вручную. Ольга ответит вам лично.';
+  const r = await run(lead({ name: 'Иван' }), { claude: claudeOk({ ...GOOD, visitor_language: 'ru', reply_for_visitor: ru }), env: { ...ENV, VERCEL_ENV: 'preview' }, headers: { 'x-lead-debug': '1' } });
+  assert.equal(r.body.reply, null);
+  assert.equal(r.body.debug.classification.reply_name, 'Ольга');
+  assert.match(r.telegram.calls[0].body.text.split('\n')[0], /^⚠️ Автовідповідь заблоковано: схоже на ім'я «Ольга»/);
+});
+
+for (const lang of ['en', 'pl', 'uk', 'ru', 'other']) {
+  test(`closing sentence added once in ${lang}, even if the model wrote its own`, async () => {
+    const text = { en: 'Thank you, I understand the problem.', pl: 'Dziękuję, rozumiem problem.', uk: 'Дякую, я зрозуміла проблему.', ru: 'Спасибо, я поняла проблему.', other: 'Danke, ich verstehe das Problem.' }[lang];
+    const own = { en: ' Olena will reply to you personally.', pl: ' Olena odpowie osobiście.', uk: ' Олена відповість вам особисто.', ru: ' Елена ответит вам лично.', other: ' Olena antwortet persönlich.' }[lang];
+    const closing = CLOSING[lang] || CLOSING.en;
+    for (const reply of [text, text + own]) {
+      const r = await run(lead(), { claude: claudeOk({ ...GOOD, visitor_language: lang, reply_for_visitor: reply }) });
+      assert.equal(r.body.reply, `${text} ${closing}`, reply);
+      assert.equal(r.body.reply.split(closing).length - 1, 1, 'exactly one closing sentence');
+    }
+  });
+}
+
+for (const [lang, reply, name] of [
+  ['en', 'Thank you, Anna, I understand the problem.', 'Anna'],
+  ['pl', 'Dziękuję, Anno, rozumiem problem.', 'Anno'],
+  ['en', 'I understand that Mark from sales copies the data by hand.', 'Mark'],
+  ['uk', 'Дякую, розумію, що Марина вручну переносить дані.', 'Марина'],
+]) {
+  test(`name in the reply is blocked: ${name}`, async () => {
+    const r = await run(lead({ name: 'Anna Nowak' }), { claude: claudeOk({ ...GOOD, visitor_language: lang, reply_for_visitor: reply }), env: { ...ENV, VERCEL_ENV: 'preview' }, headers: { 'x-lead-debug': '1' } });
+    assert.equal(r.body.reply, null);
+    assert.equal(r.body.debug.classification.reply_name, name);
+  });
+}
+
+for (const [lang, reply] of [
+  ['en', 'I understand that inquiries from WhatsApp and Gmail end up in Excel on Monday.'],
+  ['pl', 'Rozumiem, że zgłoszenia z Allegro i Gmaila trafiają do Excela, a potem do CRM.'],
+  ['uk', 'Розумію, що заявки з Телеграму та Viber губляться, а дані з Ексель не потрапляють у CRM.'],
+  ['other', 'Ich verstehe, dass die Anfragen per E-Mail kommen und die Mitarbeiter sie in Tabellen kopieren.'],
+]) {
+  test(`tool names and ordinary capitals are allowed (${lang})`, async () => {
+    const r = await run(lead(), { claude: claudeOk({ ...GOOD, visitor_language: lang, reply_for_visitor: reply }) });
+    assert.equal(r.body.reply, `${reply} ${CLOSING[lang] || CLOSING.en}`);
+  });
+}
+
 // ---------- process and summary must be Ukrainian: one retry (live test 3) ----------
 
 const LIVE_TEST_3 = {
   ...GOOD, visitor_language: 'pl', process: 'obsługa zgłoszeń klientów',
   summary: 'Firма montażowa, ок. 15 людей: заявки клієнтів губляться.',
-  first_question: 'Ile zgłoszeń wpływa tygodniowo?', reply_for_visitor: 'Dziękuję za opis. Olena odpowie osobiście.',
+  first_question: 'Ile zgłoszeń wpływa tygodniowo?', reply_for_visitor: 'Dziękuję za opis.',
 };
 const FIXED = { ...LIVE_TEST_3, process: 'обробка заявок клієнтів з email і WhatsApp', summary: 'Монтажна фірма, ~15 людей: заявки клієнтів губляться.' };
 /** Claude mock that answers with the given results in turn. */
@@ -303,7 +365,7 @@ test('Polish process and mixed summary (live test 3): one retry fixes it', async
   const correction = r.claude.calls[1].system;
   assert.match(correction, /Correction: a previous answer to this same inquiry broke the language rule for process: it contained Polish words/);
   assert.ok(!correction.includes('obsługa') && !correction.includes('Firма'), 'no model or visitor text in the system prompt');
-  assert.equal(r.body.reply, FIXED.reply_for_visitor);
+  assert.equal(r.body.reply, 'Dziękuję za opis. Olena odpowie osobiście.');
   assert.equal(r.body.debug.classification.retried, true);
   assert.deepEqual(r.body.debug.classification.retry_reason, { field: 'process', code: 'polish_letters', detail: 'Polish letters' });
   const text = r.telegram.calls[0].body.text;
@@ -317,7 +379,7 @@ test('still not Ukrainian after the retry: sent as is with ⚠️, only one retr
   const text = r.telegram.calls[0].body.text;
   assert.equal(text.split('\n')[0], '⚠️ <b>summary не українською</b>: process — польські літери (і після повторного запиту)');
   assert.match(text, /• Процес: obsługa zgłoszeń клієнтів|• Процес: obsługa zgłoszeń klientów/);
-  assert.equal(r.body.reply, LIVE_TEST_3.reply_for_visitor, 'the visitor reply is not affected');
+  assert.equal(r.body.reply, 'Dziękuję za opis. Olena odpowie osobiście.', 'the visitor reply is not affected');
 });
 
 test('mixed Latin and Cyrillic in summary triggers the retry', async () => {

@@ -6,8 +6,10 @@
  * No dependencies, so scripts/live-test-lead.mjs can load it as well.
  *
  *   en, pl  Latin letters and no Cyrillic at all (en and pl are not told apart)
- *   uk      mostly Cyrillic, has a Ukrainian-only letter (і ї є ґ), no Russian-only letters
- *   ru      mostly Cyrillic, no Ukrainian-only letters
+ *   uk      mostly Cyrillic, a Ukrainian-only letter (і ї є ґ) or word (дякую, що, як…),
+ *           no Russian-only letters or words (и, что, это, спасибо…)
+ *   ru      mostly Cyrillic, no Ukrainian-only letters or words
+ * Short replies need the words: "Дякую за опис." has none of і ї є ґ (live test 6).
  *   other   cannot be checked by script: accepted
  *
  * olenaTextProblem() is stricter: process and summary are written for Olena and
@@ -17,6 +19,9 @@
 const UKRAINIAN_ONLY = /[іїєґ]/i;
 const RUSSIAN_ONLY = /[ыэъё]/i;
 const POLISH_LETTERS = /[ąćęłńóśźż]/i;
+const word = (list) => new RegExp(`(^|[^\\p{L}])(${list})(?![\\p{L}])`, 'iu');
+const UKRAINIAN_WORDS = word('дякую|що|як|це|ви|розумію|також|дуже|коли|опис');
+const RUSSIAN_WORDS = word('и|что|это|спасибо|понимаю|вы|если|как|его|её|ее|который|которые|когда|где|только|очень|описание');
 // Latin words allowed in Ukrainian text for Olena, besides acronyms of 2–5 capitals
 // (SEO, CRM, IT, HR, API), capitalised tool names (Excel, WhatsApp) and words with
 // digits (n8n, GPT-4o). Checked per hyphen-separated part (live test 5).
@@ -40,9 +45,10 @@ function textMatchesLanguage(text, lang) {
     case 'pl':
       return cyrillic === 0 && latin > 0;
     case 'uk':
-      return cyrillic / letters >= 0.6 && UKRAINIAN_ONLY.test(s) && !RUSSIAN_ONLY.test(s);
+      return cyrillic / letters >= 0.6 && (UKRAINIAN_ONLY.test(s) || UKRAINIAN_WORDS.test(s)) &&
+        !RUSSIAN_ONLY.test(s) && !RUSSIAN_WORDS.test(s);
     case 'ru':
-      return cyrillic / letters >= 0.6 && !UKRAINIAN_ONLY.test(s);
+      return cyrillic / letters >= 0.6 && !UKRAINIAN_ONLY.test(s) && !UKRAINIAN_WORDS.test(s);
     default:
       return true;
   }
@@ -77,6 +83,7 @@ function olenaTextProblem(text, { requireUkrainianLetter = false } = {}) {
   const share = cyrillic / (cyrillic + latin);
   if (share < MIN_CYRILLIC_SHARE) return { code: 'low_cyrillic', detail: `only ${Math.round(share * 100)}% Cyrillic` };
   if (RUSSIAN_ONLY.test(s)) return { code: 'russian_letters', detail: 'Russian-only letters' };
+  if (RUSSIAN_WORDS.test(s)) return { code: 'russian_letters', detail: 'Russian words' };
   if (requireUkrainianLetter && cyrillic >= 25 && !UKRAINIAN_ONLY.test(s)) {
     return { code: 'no_ukrainian_letters', detail: 'no Ukrainian letters (і, ї, є, ґ)' };
   }

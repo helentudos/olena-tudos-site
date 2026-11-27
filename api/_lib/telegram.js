@@ -76,6 +76,7 @@ function formatMessage(lead, classification, meta) {
     const retry = r.retry_skipped ? 'повтор пропущено: не вистачило часу' : r.retry_failed ? 'повторний запит не вдався' : 'і після повторного запиту';
     warnings.push(`⚠️ <b>summary не українською</b>: ${escapeHtml(r.olena_language_problem.field)} — ${why} (${retry})`);
   }
+  if (r && r.reply_name_found) warnings.push(`⚠️ Автовідповідь заблоковано: схоже на ім'я «${escapeHtml(r.reply_name)}»; відвідувач побачив нейтральне підтвердження`);
   if (r && r.reply_language_mismatch) warnings.push('⚠️ Мова автовідповіді не збіглася з мовою заявки: відвідувач побачив нейтральне підтвердження');
 
   const head = [

@@ -81,7 +81,7 @@ form ──POST /api/lead──► validate, consent, bot checks
                          │  department, urgency, team size, summary, first question, reply
                          │  └─ any failure → the lead is forwarded as raw text
                          ├─ Telegram → message to Olena (⚠️ for spam, injection or no AI)
-                         └─ visitor: automatic reply (labelled) or a neutral confirmation
+                         └─ visitor: automatic reply or a neutral confirmation
 ```
 
 The visitor's text is treated as data, never as instructions: it is sent as escaped JSON inside `<inquiry>` tags, the output is limited by a strict schema, and model text is shown only as plain text. Full rules: the *Inquiry form* section of [CLAUDE.md](CLAUDE.md).

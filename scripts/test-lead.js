@@ -115,6 +115,8 @@ test('request to Claude: model, effort, strict schema, inquiry as escaped JSON',
   assert.match(req.system, /For the visitor, always in the visitor_language: first_question and reply_for_visitor/);
   assert.match(req.system, /Example 2\. An inquiry in English/);
   assert.match(req.system, /Do not write any name of a person/);
+  assert.match(req.system, /Write impersonally: no first person at all/);
+  for (const ex of req.system.match(/reply_for_visitor: "[^"]*"/g)) assert.ok(!/\b(I understand|Rozumiem|Розумію|Понимаю)\b/u.test(ex), `first person in example: ${ex}`);
   assert.match(req.system, /Do not add a closing sentence about who will reply/);
   assert.ok(!/reply_for_visitor: "[^"]*(Olena|Олена|Елена)[^"]*"/.test(req.system), 'examples must not contain names');
   // generation order: Ukrainian fields for Olena, then the visitor's language, then text for the visitor

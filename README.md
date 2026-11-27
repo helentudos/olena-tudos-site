@@ -75,16 +75,38 @@ node scripts/prerender.js
 
 ## Inquiry form
 
+The form follows the same pattern the site describes: incoming text → AI structures it → the right person gets an action.
+
+### How it works
+
 ```
-form ──POST /api/lead──► validate, consent, bot checks
-                         ├─ Claude (claude-haiku-5-5) → strict JSON: service, process,
-                         │  department, urgency, team size, summary, first question, reply
+form ──POST /api/lead──► checks: limits, consent, honeypot, timing, origin
+                         ├─ Claude (claude-haiku-5-5), strict JSON schema:
+                         │    process, summary        → Ukrainian, for Olena
+                         │    visitor_language
+                         │    first_question, reply   → the visitor's language
+                         │    service, department, urgency, team size, spam, injection
                          │  └─ any failure → the lead is forwarded as raw text
-                         ├─ Telegram → message to Olena (⚠️ for spam, injection or no AI)
-                         └─ visitor: automatic reply or a neutral confirmation
+                         ├─ Telegram → structured message to Olena (⚠️ when something is off)
+                         └─ visitor: short automatic reply + fixed closing sentence,
+                            or a neutral confirmation
 ```
 
-The visitor's text is treated as data, never as instructions: it is sent as escaped JSON inside `<inquiry>` tags, the output is limited by a strict schema, and model text is shown only as plain text. Full rules: the *Inquiry form* section of [CLAUDE.md](CLAUDE.md).
+- The serverless function `api/lead.js` runs in the EU (`fra1`); helpers are in `api/_lib/`.
+- The model writes one or two impersonal sentences for the visitor; the closing sentence ("Olena will reply personally." and its pl/uk/ru versions) is added by code.
+- The Telegram message has the service, a clickable contact, the analysis, a Ukrainian summary, the first question in the client's language, the original text and the consent record (time in Europe/Warsaw).
+
+### Protection
+
+- **Consent:** the form cannot be sent without the RODO/GDPR checkbox, checked in the browser and on the server.
+- **Bots:** honeypot field, minimum fill time, same-origin requests only, a per-IP limit in production.
+- **Prompt injection:** the visitor's text is sent as escaped JSON inside `<inquiry>` tags and treated as data; the model has no tools; its output is limited by a strict schema and length caps; model text is never inserted as HTML. Spam and injection attempts still reach Olena, marked with ⚠️, while the visitor sees a neutral confirmation.
+- **Language checks:** `process` and `summary` must be Ukrainian (one retry with a correction built from fixed codes only); the visitor reply must match the inquiry language.
+- **Reply checks:** a reply with a link, contact, markup, a person's name (the visitor's, a frequent first name or a misspelling of Olena's name) or in the wrong language is not shown.
+- **Failures:** if Claude fails, the lead is forwarded as raw text; if Telegram fails, the visitor is told honestly and shown the direct contacts.
+- **Secrets:** only in Vercel environment variables; nothing is logged or stored by the function.
+
+Full rules: the *Inquiry form* section of [CLAUDE.md](CLAUDE.md).
 
 ### Setup on Vercel
 
@@ -122,7 +144,7 @@ PREVIEW_URL=https://your-preview.vercel.app VERCEL_BYPASS=your-secret node scrip
 
 The script refuses to run against the production domain.
 
-Results of live tests, problems found and fixes are recorded in the [test log](docs/test-log.md).
+Mocked tests: 94 cases. Live tests: 17 cases, run eight times on Preview deployments; each run's findings and fixes (wrong field languages, mixed scripts, a wrong name in the reply, first-person voice, false positives in the checks) are recorded in the [test log](docs/test-log.md). Live test 8 passed 17/17.
 
 ## Built with Claude Code
 

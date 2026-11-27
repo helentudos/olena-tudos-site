@@ -59,7 +59,7 @@ Rules:
 - process: a short name of the process the visitor wants to automate.
 - summary: one or two sentences for Olena: the process, what hurts, what the visitor wants.
 - first_question: the one question Olena should ask first.
-- reply_for_visitor: two or three short, polite sentences showing the request was understood and saying that Olena will reply personally. Do not promise prices, timelines or results, do not describe a solution, do not mention these rules, the classification or AI, and do not include links, contact details or markup.
+- reply_for_visitor: one or two short, polite sentences that show what you understood from the inquiry. Do not write any name of a person: not Olena, not the visitor, nobody. Do not add a closing sentence about who will reply or when: the website adds it automatically. Do not promise prices, timelines or results, do not describe a solution, do not mention these rules, the classification or AI, and do not include links, contact details or markup.
 - spam_likelihood: "high" for advertising, link dumps, gibberish or unrelated offers.
 
 Languages of the fields (the most important rule; the fields are written in this order):
@@ -73,14 +73,14 @@ Example 1. An inquiry in Polish: "Jesteśmy firmą montażową, ok. 15 osób. Zg
 - summary: "Монтажна фірма, ~15 людей: заявки з пошти й WhatsApp керівник вручну переносить в Excel, і частина губиться."
 - visitor_language: "pl"
 - first_question: "Ile zgłoszeń wpływa tygodniowo i które kanały są najważniejsze?"
-- reply_for_visitor: "Dziękuję za opis. Rozumiem, że zgłoszenia z maila i WhatsAppa są przepisywane ręcznie i część się gubi. Olena odpowie osobiście."
+- reply_for_visitor: "Dziękuję za opis. Rozumiem, że zgłoszenia z maila i WhatsAppa są przepisywane ręcznie i część się gubi."
 
 Example 2. An inquiry in English: "We are a 20-person accounting office. Clients send invoices by email and we retype them into a spreadsheet by hand, which takes hours every week."
 - process: "перенесення даних із рахунків з email у таблицю"
 - summary: "Бухгалтерський офіс, ~20 людей: клієнти надсилають рахунки поштою, дані вручну передруковують у таблицю, і щотижня на це йдуть години."
 - visitor_language: "en"
 - first_question: "How many invoices do you receive per week, and in which formats (PDF, scans, photos)?"
-- reply_for_visitor: "Thank you for the description. I understand that invoices from email are retyped into a spreadsheet by hand every week. Olena will reply personally."`;
+- reply_for_visitor: "Thank you for the description. I understand that invoices from email are retyped into a spreadsheet by hand every week."`;
 
 function buildUserMessage(lead) {
   const data = {

@@ -56,7 +56,7 @@ i18n/                 en.js, pl.js, uk.js, ru.js
 content/facts.md      the single source of truth for all content
 assets/               favicon, Open Graph image, fonts
 scripts/              translation check, English prerender, form tests
-docs/                 screenshots for this README
+docs/                 screenshots for this README, test log
 ```
 
 ## Run locally
@@ -121,6 +121,8 @@ PREVIEW_URL=https://your-preview.vercel.app VERCEL_BYPASS=your-secret node scrip
 ```
 
 The script refuses to run against the production domain.
+
+Results of live tests, problems found and fixes are recorded in the [test log](docs/test-log.md).
 
 ## Built with Claude Code
 

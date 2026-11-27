@@ -2,6 +2,32 @@
 
 Live tests of the inquiry form run against a Vercel **Preview** deployment with the real Claude API and Telegram (`scripts/live-test-lead.mjs`, see the README). Each entry records what was tested, what was found and what changed. Newest first.
 
+## Live test 6 — 16/17; spam FAIL from an outdated local script; new bug found manually: wrong name „Ольга“ in the Russian reply and missing closing sentence — fixed by moving the closing sentence to code
+
+- **Date:** 2026-11-28
+- **Where:** a new Preview deployment of `claude/create-claude-md-rules-fgkppd`, all 17 cases, run by Olena
+
+**`spam` FAIL — outdated script:** the server did not retry (no `retried`), but the local check complained. Olena most likely ran an older copy of `live-test-lead.mjs` from a ZIP: in the branch, the script uses the server's own check (`olenaTextProblem` from `api/_lib/language.js`), which passes this text since live test 5. To make this visible, the script now prints the checks version and the commit it runs from at the start; a copy outside git says "not a git checkout (ZIP copy?)".
+
+**New bug, found manually (the tests did not catch it):**
+
+- In `valid-ru` the visitor saw «… Ольга ответит вам лично.»: the model wrote a wrong name (Olena in Russian is Елена) in the text the client sees.
+- In `valid-en` the closing sentence "Olena will reply personally" was missing: the model added it inconsistently.
+
+**Cause:** the prompt itself asked the model to say that Olena will reply, so the model wrote and translated the name, and sometimes forgot the sentence. The live tests only checked the language of the reply, not names or the closing sentence.
+
+**Fix:**
+
+- **Prompt:** `reply_for_visitor` is now one or two sentences about what was understood, with no names of any person and no closing sentence; the examples were changed to match.
+- **Closing sentence in code** (`api/_lib/reply.js`): added as fixed text in the reply language: en "Olena will reply personally.", pl "Olena odpowie osobiście.", uk "Олена відповість особисто.", ru "Елена ответит лично."; English for other languages. If the model still writes its own sentence about Olena, that sentence is removed first, so the closing appears exactly once.
+- **Name guard:** the reply is hidden (neutral confirmation for the visitor, "⚠️ Автовідповідь заблоковано: схоже на ім'я «…»" for Olena) if it contains the visitor's own name, a frequent first name, or, except for "other" languages (German capitalises nouns), a capitalised word in the middle of a sentence that is not a tool name (also declined: Gmaila, Excela, Телеграму), an acronym or an English capitalised word (I, Monday, English).
+- **Language check for short replies:** without the closing sentence, "Дякую за опис." has none of і, ї, є, ґ. Ukrainian and Russian are now also told apart by common words (дякую, що, як, це… / и, что, это, спасибо…).
+- **Tests:** `scripts/test-lead.js` (85 tests) covers the exact reply from this run, the closing in every language (with and without the model's own sentence), names (the visitor's, Mark, Марина) and allowed tool names; disabling the name guard fails 5 tests, not adding the closing fails 19. `scripts/live-test-lead.mjs` now checks that the visible reply has no names and ends with exactly one closing sentence in the right language, and reports a reply hidden because of a name.
+
+**Known limits:** a rare first name at the start of a sentence is caught only if it is in the list or is the visitor's own name; an unknown capitalised word that is not a tool name is treated as a name (the visitor then sees the neutral confirmation).
+
+**Status:** fixed; to be confirmed by live test 7 (run the script from the current branch: the first line must show `commit` and the checks version).
+
 ## Live test 5 — full suite: 15/17; 2 false positives in checks (hyphenated Latin acronyms; HACKED in summary of a detected injection) — fixed
 
 - **Date:** 2026-11-27

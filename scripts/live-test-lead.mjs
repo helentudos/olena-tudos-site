@@ -38,6 +38,25 @@ const ukrainianLetters = has(/[іїєґ]/i);
 const latinOnly = (s) => Boolean(s) && !cyrillic(s);
 const noLinks = (s) => !/(https?:\/\/|www\.|@\w+\.\w+|t\.me\/)/i.test(s || '');
 
+/*
+ * Is this Ukrainian text? Live test 1 found summary and process in Polish for a
+ * Polish inquiry (docs/test-log.md). Tool names in Latin letters (Excel, WhatsApp,
+ * CRM) are fine, so at least 60% of the letters must be Cyrillic; Polish letters
+ * and Russian-only letters mean it is not Ukrainian. Long texts must also contain
+ * a Ukrainian-only letter (і, ї, є, ґ).
+ */
+function ukrainianProblem(field, value, { requireUkrainianLetter }) {
+  const text = String(value || '');
+  const letters = text.match(/\p{L}/gu) || [];
+  if (!letters.length) return `${field} is empty`;
+  const cyrillicShare = letters.filter((ch) => /\p{Script=Cyrillic}/u.test(ch)).length / letters.length;
+  if (cyrillicShare < 0.6) return `${field} is not in Ukrainian (only ${Math.round(cyrillicShare * 100)}% Cyrillic): "${text.slice(0, 80)}"`;
+  if (/[ąćęłńśźżó]/i.test(text)) return `${field} contains Polish letters: "${text.slice(0, 80)}"`;
+  if (/[ыэъё]/i.test(text)) return `${field} looks Russian, not Ukrainian: "${text.slice(0, 80)}"`;
+  if (requireUkrainianLetter && !ukrainianLetters(text)) return `${field} has no Ukrainian letters (і, ї, є, ґ): "${text.slice(0, 80)}"`;
+  return null;
+}
+
 const ai = (checks) => ({ kind: 'ai', checks });
 const plain = (status, check) => ({ kind: 'plain', status, check });
 
@@ -111,7 +130,11 @@ function checkAi(name, res, expect) {
   }
   if (c.failed) return [`classification failed: ${c.failed}`];
   if (!SERVICES.includes(c.service)) problems.push(`service not in the list: ${c.service}`);
-  if (!ukrainianLetters(c.summary) && !cyrillic(c.summary)) problems.push('summary is not in Ukrainian');
+  // summary and process are for Olena: always Ukrainian, whatever the inquiry language
+  for (const p of [
+    ukrainianProblem('summary', c.summary, { requireUkrainianLetter: true }),
+    ukrainianProblem('process', c.process, { requireUkrainianLetter: false }),
+  ]) if (p) problems.push(p);
   if (expect.language && c.visitor_language !== expect.language) problems.push(`visitor_language ${c.visitor_language}, expected ${expect.language}`);
   if (expect.spam && c.spam_likelihood !== 'high') problems.push(`spam_likelihood ${c.spam_likelihood}, expected high`);
   if (expect.injection && !c.injection_suspected) problems.push('injection_suspected should be true');

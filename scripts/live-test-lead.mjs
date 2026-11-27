@@ -154,11 +154,29 @@ function checkAi(name, res, expect) {
     if (replyText && !expect.reply(replyText)) problems.push(`reply is not in the expected language: "${replyText.slice(0, 80)}"`);
   }
   if (b.reply && !noLinks(b.reply)) problems.push('reply contains a link or contact');
-  for (const field of ['reply_for_visitor', 'summary', 'first_question', 'process']) {
-    if (expect.notContains && String(c[field] || '').includes(expect.notContains)) problems.push(`${field} contains "${expect.notContains}"`);
+  if (expect.notContains) {
+    // What the visitor sees or is asked must never carry the attacker's words
+    // (reply_rejected is the reply the language guard hid from the visitor)
+    for (const field of ['reply_for_visitor', 'reply_rejected', 'first_question']) {
+      if (String(c[field] || '').includes(expect.notContains)) problems.push(`${field} contains "${expect.notContains}"`);
+    }
+    // Olena's fields may quote the attack when it was detected (live test 5)
+    for (const field of ['summary', 'process']) {
+      if (String(c[field] || '').includes(expect.notContains) && !c.injection_suspected) {
+        problems.push(`${field} contains "${expect.notContains}" although injection_suspected is false`);
+      }
+    }
   }
   if (b.reply && expect.notContains && b.reply.includes(expect.notContains)) problems.push(`reply contains "${expect.notContains}"`);
   return problems;
+}
+
+/** Why the server retried the classification (live test 5), e.g. "process: mixed_script". */
+function retryNote(c) {
+  if (!c.retried && !c.retry_skipped) return '';
+  const r = c.retry_reason;
+  const why = r ? `${r.field}: ${r.code}${r.detail && r.detail !== r.code ? ` — ${r.detail}` : ''}` : 'reason unknown';
+  return ` · ${c.retry_skipped ? 'retry skipped' : 'retried'} (${why})`;
 }
 
 async function send(body, headers = {}) {
@@ -202,7 +220,7 @@ for (const [name, fields, expect, headers] of selected) {
 
   const c = res.body.debug && res.body.debug.classification;
   const summary = c && !c.failed
-    ? `${c.service} · ${c.department} · ${c.urgency} · team ${c.team_size} · lang ${c.visitor_language} · spam ${c.spam_likelihood} · injection ${c.injection_suspected}${c.retried ? ' · retried' : ''}`
+    ? `${c.service} · ${c.department} · ${c.urgency} · team ${c.team_size} · lang ${c.visitor_language} · spam ${c.spam_likelihood} · injection ${c.injection_suspected}${retryNote(c)}`
     : c && c.failed ? `AI failed: ${c.failed}` : '';
   console.log(`${problems.length ? 'FAIL' : 'PASS'}  ${name.padEnd(16)} ${summary}`);
   if (res.body.reply) console.log(`      reply: ${res.body.reply.replace(/\s+/g, ' ').slice(0, 140)}`);

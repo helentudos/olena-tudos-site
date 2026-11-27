@@ -21,7 +21,7 @@ import { fileURLToPath } from 'node:url';
 
 // Bump when the checks change, so an outdated copy (for example from an old ZIP) is
 // easy to spot in the output (live test 6).
-const CHECKS_VERSION = '2026-11-28 · live test 6: names and closing sentence in code';
+const CHECKS_VERSION = '2026-11-28 · live test 7: narrower name guard, no first person';
 function scriptCommit() {
   try {
     return execSync('git rev-parse --short HEAD', { cwd: dirname(fileURLToPath(import.meta.url)), stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim();
@@ -174,6 +174,10 @@ function checkAi(name, res, expect, fields) {
     const visitorName = String(fields.name || '').replace('[TEST]', '').trim();
     const nameFound = findNameLike(modelPart, { lang: c.visitor_language, visitorName });
     if (nameFound) problems.push(`reply contains a name: «${nameFound}»`);
+    // Impersonal voice: no first person and no gendered "I understood" (live test 7)
+    const firstPerson = FIRST_PERSON[c.visitor_language];
+    const found = firstPerson && modelPart.match(firstPerson);
+    if (found) problems.push(`reply is in the first person ("${found[2] || found[0]}"): "${modelPart.slice(0, 80)}"`);
   }
   const lang = expect.language;
   if (['en', 'pl', 'uk', 'ru'].includes(lang)) {
@@ -200,6 +204,15 @@ function checkAi(name, res, expect, fields) {
   if (b.reply && expect.notContains && b.reply.includes(expect.notContains)) problems.push(`reply contains "${expect.notContains}"`);
   return problems;
 }
+
+// First person in the visitor reply, per language (a short thanks is allowed)
+const fpWords = (list) => new RegExp(`(^|[^\\p{L}'’-])(${list})(?![\\p{L}'’-])`, 'u');
+const FIRST_PERSON = {
+  en: fpWords("I|I'm|I've|I'd|I'll|me|my|myself|I understand"),
+  pl: fpWords('ja|Ja|mnie|Mnie|mi|Mi|rozumiem|Rozumiem|zrozumiałam|Zrozumiałam|zrozumiałem|Zrozumiałem|widzę|Widzę'),
+  uk: fpWords('я|Я|мені|Мені|мене|Мене|розумію|Розумію|зрозуміла|Зрозуміла|зрозумів|Зрозумів|бачу|Бачу'),
+  ru: fpWords('я|Я|мне|Мне|меня|Меня|понимаю|Понимаю|поняла|Поняла|понял|Понял|вижу|Вижу'),
+};
 
 /** Why the server retried the classification (live test 5), e.g. "process: mixed_script". */
 function retryNote(c) {

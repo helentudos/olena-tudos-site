@@ -35,14 +35,14 @@
       // another language, until that language is applied (avoids a flash of English).
       var lang = null;
       try { lang = localStorage.getItem('lang'); } catch (e) {}
-      if (lang === 'pl' || lang === 'uk') document.documentElement.classList.add('js-loading');
+      if (lang === 'pl' || lang === 'uk' || lang === 'ru') document.documentElement.classList.add('js-loading');
     })();
   </script>
   <link rel="stylesheet" href="css/styles.css">
   <noscript>
     <style>
       /* Without JavaScript: English only, no language/theme switch, menu shown as a plain list */
-      .lang-switch, .theme-toggle, .menu-toggle { display: none !important; }
+      .lang-switch, .theme-toggle, .menu-toggle, .lead-box { display: none !important; }
       .header-inner { flex-wrap: wrap; padding-block: 10px; }
       .site-nav { display: block; position: static; width: 100%; background: transparent; border: 0; box-shadow: none; }
       .site-nav ul { display: flex; flex-wrap: wrap; gap: 4px 18px; padding: 0; }
@@ -54,6 +54,7 @@
   <script src="js/i18n.js" defer></script>
   <script src="js/main.js" defer></script>
   <script src="js/motion.js" defer></script>
+  <script src="js/form.js" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main" data-i18n="a11y.skip">Skip to content</a>
@@ -82,6 +83,7 @@
           <button type="button" data-lang="en" lang="en"><span data-i18n="lang.enShort">EN</span> <span class="visually-hidden" data-i18n="lang.en">English</span></button>
           <button type="button" data-lang="pl" lang="pl"><span data-i18n="lang.plShort">PL</span> <span class="visually-hidden" data-i18n="lang.pl">Polski</span></button>
           <button type="button" data-lang="uk" lang="uk"><span data-i18n="lang.ukShort">UA</span> <span class="visually-hidden" data-i18n="lang.uk">Українська</span></button>
+          <button type="button" data-lang="ru" lang="ru"><span data-i18n="lang.ruShort">RU</span> <span class="visually-hidden" data-i18n="lang.ru">Русский</span></button>
         </div>
         <button type="button" class="menu-toggle" aria-expanded="false" aria-controls="site-nav">
           <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
@@ -538,6 +540,53 @@
       <div class="container">
         <h2 id="contact-title" data-i18n="contact.title">Contact</h2>
         <p class="section-lead" data-i18n="contact.lead">Tell me which process takes up most of your team's time.</p>
+
+        <!-- Inquiry form: sent with JavaScript to /api/lead (see CLAUDE.md, Inquiry form) -->
+        <div class="lead-box">
+          <h3 class="lead-title" id="lead-title" data-i18n="form.title">Send an inquiry</h3>
+          <form class="lead-form" id="lead-form" novalidate aria-labelledby="lead-title">
+            <div class="field">
+              <label for="lead-name" data-i18n="form.name.label">Name</label>
+              <input id="lead-name" name="name" type="text" autocomplete="name" required minlength="2" maxlength="80" aria-describedby="lead-name-error">
+              <p class="field-error" id="lead-name-error" hidden></p>
+            </div>
+            <div class="field">
+              <label for="lead-contact" data-i18n="form.contact.label">Email or Telegram</label>
+              <input id="lead-contact" name="contact" type="text" autocomplete="email" inputmode="email" spellcheck="false" required maxlength="100" aria-describedby="lead-contact-hint lead-contact-error">
+              <p class="field-hint" id="lead-contact-hint" data-i18n="form.contact.hint">For example name@company.com or @username</p>
+              <p class="field-error" id="lead-contact-error" hidden></p>
+            </div>
+            <div class="field">
+              <label for="lead-description" data-i18n="form.description.label">Which process would you like to automate?</label>
+              <textarea id="lead-description" name="description" rows="6" required minlength="20" maxlength="2000" aria-describedby="lead-description-hint lead-description-error"></textarea>
+              <p class="field-hint" id="lead-description-hint" data-i18n="form.description.hint">What happens now, where time gets lost, who is involved. 20–2000 characters.</p>
+              <p class="field-error" id="lead-description-error" hidden></p>
+            </div>
+            <!-- Honeypot: hidden from people and screen readers, bots fill it -->
+            <div class="hp" aria-hidden="true">
+              <label for="lead-website" data-i18n="form.hp.label">Leave this field empty</label>
+              <input id="lead-website" name="website" type="text" tabindex="-1" autocomplete="off">
+            </div>
+            <div class="field consent">
+              <input id="lead-consent" name="consent" type="checkbox" required aria-describedby="lead-consent-error">
+              <label for="lead-consent" data-i18n="form.consent">I agree that Olena Tudos processes the data in this form to reply to my inquiry. The text is sorted with the help of an AI service (Claude by Anthropic) and delivered to her via Telegram; Anthropic and Telegram process it as service providers, including outside the EU. The data is not stored on this website; Olena keeps it until our conversation ends, for no longer than 12 months. I can ask for deletion at any time at helena.tudos@gmail.com.</label>
+              <p class="field-error" id="lead-consent-error" hidden></p>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary" id="lead-submit"><span data-i18n="form.submit">Send inquiry</span></button>
+              <p class="form-status" id="lead-status" role="status" aria-live="polite"></p>
+            </div>
+          </form>
+          <div class="lead-result" id="lead-result" hidden tabindex="-1">
+            <p class="lead-thanks" data-i18n="form.thanks">Thank you! Your inquiry has been sent.</p>
+            <p class="lead-will-reply" id="lead-will-reply" data-i18n="form.willReply">Olena will reply personally to the contact you provided.</p>
+            <div class="lead-reply" id="lead-reply" hidden>
+              <p class="lead-reply-text" id="lead-reply-text"></p>
+            </div>
+          </div>
+        </div>
+
+        <h3 class="contacts-title" data-i18n="contact.direct">Or write directly</h3>
         <ul class="contacts">
           <li>
             <a href="https://t.me/helena_wro" target="_blank" rel="noopener noreferrer">

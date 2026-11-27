@@ -6,11 +6,12 @@
 (function () {
   'use strict';
 
-  var SUPPORTED = ['en', 'pl', 'uk'];
+  var SUPPORTED = ['en', 'pl', 'uk', 'ru'];
   var DEFAULT_LANG = 'en'; // English is always the default; only a visitor's own choice overrides it
   var STORAGE_KEY = 'lang';
 
   window.I18N = window.I18N || {};
+  var currentLang = DEFAULT_LANG;
 
   function savedLang() {
     try {
@@ -57,6 +58,7 @@
       });
     });
 
+    currentLang = lang;
     document.documentElement.lang = lang;
     document.title = translate(dict, 'meta.title');
 
@@ -96,4 +98,10 @@
   setLanguage(savedLang() || DEFAULT_LANG);
 
   window.setLanguage = setLanguage;
+
+  /** Text for a key in the current language (used by js/form.js for dynamic messages). */
+  window.i18nT = function (key) {
+    var dict = window.I18N[currentLang] || window.I18N[DEFAULT_LANG] || {};
+    return Object.prototype.hasOwnProperty.call(dict, key) ? dict[key] : '';
+  };
 })();

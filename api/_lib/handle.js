@@ -68,8 +68,7 @@ async function handleLead(req, deps) {
     injection: Boolean(result && result.injection_suspected),
   };
 
-  const consentAt = new Date(now).toISOString().slice(0, 16).replace('T', ' ');
-  const sent = await sendTelegram(formatMessage(lead, classification, { consentAt, flags }), {
+  const sent = await sendTelegram(formatMessage(lead, classification, { consentTime: now, flags }), {
     fetch: deps.fetch,
     token: env.TELEGRAM_BOT_TOKEN,
     chatId: env.TELEGRAM_CHAT_ID,

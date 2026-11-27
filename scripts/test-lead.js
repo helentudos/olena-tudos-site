@@ -84,14 +84,16 @@ test('valid inquiry: classified, sent to Telegram, visitor gets the AI reply', a
   assert.match(tg.url, /\/bottest-token\/sendMessage$/);
   assert.equal(tg.body.chat_id, '42');
   assert.equal(tg.body.parse_mode, 'HTML');
-  assert.match(tg.body.text, /🆕 <b>Нова заявка<\/b> · Вхідні заявки/);
-  assert.match(tg.body.text, /2026-11-26 10:14 UTC, версія тексту v1/);
+  assert.ok(tg.body.text.startsWith('🆕 <b>Нова заявка</b>\n📥 <b>Вхідні заявки → маршрутизація</b>'));
+  assert.match(tg.body.text, /👤 <b>Anna<\/b>\n✉️ <a href="mailto:anna@firma\.pl">anna@firma\.pl<\/a>\n🌐 Сайт: EN · Заявка: EN/);
+  // 10:14 UTC on 26 November is 11:14 in Warsaw (CET)
+  assert.match(tg.body.text, /<i>Згода v1 · 26\.11 11:14 \(Варшава\) · спам: low<\/i>$/);
 });
 
 test('unknown UI language falls back to en', async () => {
   const r = await run(lead({ ui_language: 'de' }));
   assert.equal(r.status, 200);
-  assert.match(r.telegram.calls[0].body.text, /<b>Мова сайту:<\/b> en/);
+  assert.match(r.telegram.calls[0].body.text, /🌐 Сайт: EN · /);
 });
 
 test('Russian is a known visitor language, not "other"', async () => {
@@ -120,7 +122,9 @@ for (const [lang, contact] of [['pl', '@anna_pl'], ['uk', 'https://t.me/anna_ua'
     const r = await run(lead({ ui_language: lang, contact }), { claude: claudeOk({ ...GOOD, visitor_language: lang }) });
     assert.equal(r.status, 200);
     assert.equal(r.body.replyLanguage, lang);
-    assert.match(r.telegram.calls[0].body.text, /\(Telegram\)/);
+    assert.match(r.telegram.calls[0].body.text, /💬 <a href="https:\/\/t\.me\/anna_(pl|ua|ru)">@anna_(pl|ua|ru)<\/a>/);
+    const code = lang === 'uk' ? 'UA' : lang.toUpperCase();
+    assert.match(r.telegram.calls[0].body.text, new RegExp(`🌐 Сайт: ${code} · Заявка: ${code}`));
   });
 }
 
@@ -238,7 +242,10 @@ for (const [name, make, expected] of failures) {
     assert.equal(r.status, 200);
     assert.deepEqual(r.body, { ok: true, reply: null });
     const text = r.telegram.calls[0].body.text;
-    assert.match(text, /⚠️ <b>Заявка без класифікації<\/b>/);
+    assert.ok(text.startsWith('⚠️ <b>Без класифікації</b>'), 'warning must be the first line');
+    assert.match(text, /📥 <b>Послуга не визначена<\/b>/);
+    assert.ok(!text.includes('📋 Розбір'), 'no analysis without classification');
+    assert.match(text, /спам: —<\/i>$/);
     assert.match(text, /Raw text &lt;b&gt;must&lt;\/b&gt; arrive &amp; be escaped/);
     assert.match(text, new RegExp(`AI: ${expected}`));
   });
@@ -271,13 +278,78 @@ test('HTML in every field is escaped in Telegram', async () => {
   const r = await run(lead({ name: '<script>alert(1)</script>', description: '<img src=x onerror=alert(1)> & we lose leads every day' }),
     { claude: claudeOk({ ...GOOD, process: '<b>x</b>', summary: '<a href="x">s</a>', first_question: '<i>q</i>' }) });
   const text = r.telegram.calls[0].body.text;
-  for (const raw of ['<script>', '<img', '<a href', '<i>q']) assert.ok(!text.includes(raw), raw);
+  for (const raw of ['<script>', '<img', '<a href="x"', '<i>q', '<b>x']) assert.ok(!text.includes(raw), raw);
+  assert.match(text, /&lt;a href=&quot;x&quot;&gt;s&lt;\/a&gt;/);
   assert.match(text, /&lt;script&gt;alert\(1\)&lt;\/script&gt;/);
 });
 
 test('very long description stays under the Telegram limit', async () => {
   const r = await run(lead({ description: '<&>'.repeat(666) }));
   assert.ok(r.telegram.calls[0].body.text.length <= 4096);
+});
+
+// ---------- Telegram message layout ----------
+
+const { formatMessage, warsawTime, TELEGRAM_LIMIT } = require('../api/_lib/telegram');
+const LEAD_OBJ = { name: 'Test Anna', contact: { type: 'email', value: 'anna.test@example.com' }, description: 'Jesteśmy firmą montażową.', uiLanguage: 'en', consentVersion: 'v1' };
+const okResult = (overrides = {}) => ({ ok: true, result: { ...GOOD, visitor_language: 'pl', ...overrides } });
+const NOV = Date.UTC(2026, 10, 27, 21, 26);
+
+test('Telegram layout: sections in order', () => {
+  const text = formatMessage(LEAD_OBJ, okResult(), { consentTime: NOV, flags: {} });
+  const order = ['🆕 <b>Нова заявка</b>', '📥 <b>', '👤 <b>Test Anna</b>', '✉️ <a href="mailto:', '🌐 Сайт: EN · Заявка: PL',
+    '<b>📋 Розбір</b>', '• Процес: ', '• Відділ: продажі', '• Команда: 11–50', '• Терміновість: висока',
+    '<b>💡 Суть</b>', '<b>❓ Перше питання</b> (мовою клієнта)', '<i>How many emails a day?</i>',
+    '<blockquote expandable>📝 Оригінал заявки\nJesteśmy', '<i>Згода v1 · 27.11 22:26 (Варшава) · спам: low</i>'];
+  let at = -1;
+  for (const part of order) {
+    const i = text.indexOf(part);
+    assert.ok(i > at, `"${part}" missing or out of order`);
+    at = i;
+  }
+});
+
+test('Telegram layout: warnings come first, in a fixed order', () => {
+  const text = formatMessage(LEAD_OBJ, okResult({ reply_blocked: true }), { consentTime: NOV, flags: { spam: true, injection: true } });
+  const lines = text.split('\n');
+  assert.equal(lines[0], '⚠️ <b>Можлива спроба prompt injection</b>');
+  assert.equal(lines[1], '⚠️ <b>Можливий спам</b>');
+  assert.match(lines[2], /^⚠️ Автовідповідь відвідувачу заблоковано/);
+  assert.equal(lines[3], '🆕 <b>Нова заявка</b>');
+});
+
+test('Telegram layout: clickable contacts are escaped', () => {
+  const email = formatMessage({ ...LEAD_OBJ, contact: { type: 'email', value: 'a&b"x@example.com' } }, okResult(), { consentTime: NOV, flags: {} });
+  assert.match(email, /<a href="mailto:a&amp;b&quot;x@example\.com">a&amp;b&quot;x@example\.com<\/a>/);
+  const tg = formatMessage({ ...LEAD_OBJ, contact: { type: 'telegram', value: '@anna_test_tg' } }, okResult(), { consentTime: NOV, flags: {} });
+  assert.match(tg, /💬 <a href="https:\/\/t\.me\/anna_test_tg">@anna_test_tg<\/a>/);
+});
+
+test('Telegram layout: time is shown in Europe/Warsaw, winter and summer', () => {
+  assert.equal(warsawTime(Date.UTC(2026, 10, 27, 21, 26)), '27.11 22:26'); // CET, UTC+1
+  assert.equal(warsawTime(Date.UTC(2026, 6, 1, 10, 0)), '01.07 12:00'); // CEST, UTC+2
+  assert.equal(warsawTime(Date.UTC(2026, 11, 31, 23, 30)), '01.01 00:30'); // crosses midnight and year
+});
+
+test('Telegram layout: HTML tags are balanced', () => {
+  for (const [cls, flags] of [[okResult(), {}], [{ ok: false, reason: 'refusal' }, {}], [okResult({ reply_blocked: true }), { spam: true }]]) {
+    const text = formatMessage({ ...LEAD_OBJ, name: '<b>x</b>', description: '</blockquote><i>' }, cls, { consentTime: NOV, flags });
+    for (const tag of ['b', 'i', 'a', 'blockquote']) {
+      const open = (text.match(new RegExp(`<${tag}[ >]`, 'g')) || []).length;
+      const close = (text.match(new RegExp(`</${tag}>`, 'g')) || []).length;
+      assert.equal(open, close, `<${tag}> not balanced`);
+    }
+  }
+});
+
+test('Telegram layout: a long original is cut with a mark and the message fits the limit', () => {
+  const text = formatMessage({ ...LEAD_OBJ, description: 'Ä<&>'.repeat(500) + 'THE-END' }, okResult(), { consentTime: NOV, flags: {} });
+  assert.ok(text.length <= TELEGRAM_LIMIT, `length ${text.length}`);
+  assert.match(text, /… \[обрізано\]<\/blockquote>/);
+  assert.ok(!text.includes('THE-END'));
+  assert.match(text, /<i>Згода v1 · /, 'footer survives truncation');
+  const short = formatMessage(LEAD_OBJ, okResult(), { consentTime: NOV, flags: {} });
+  assert.ok(!short.includes('[обрізано]'));
 });
 
 // ---------- debug output only on Preview ----------

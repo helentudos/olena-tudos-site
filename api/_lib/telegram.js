@@ -9,7 +9,7 @@ const TELEGRAM_LIMIT = 4096;
 const SEND_TIMEOUT_MS = 5000;
 
 const SERVICE_LABELS = {
-  incoming_requests: 'Вхідні заявки → структура і маршрутизація',
+  incoming_requests: 'Вхідні заявки → маршрутизація',
   voice_documents: 'Голос і документи → дані',
   internal_requests: 'Внутрішні запити команди',
   manager_reports: 'Звіти для керівника',
@@ -21,69 +21,93 @@ const DEPARTMENT_LABELS = {
   other: 'інше', unknown: 'не вказано',
 };
 const URGENCY_LABELS = { low: 'низька', medium: 'середня', high: 'висока', unknown: 'не вказано' };
-const LANGUAGE_LABELS = { en: 'en', pl: 'pl', uk: 'uk', ru: 'ru', other: 'інша' };
+const LANGUAGE_LABELS = { en: 'EN', pl: 'PL', uk: 'UA', ru: 'RU', other: 'інша' };
+const TRUNCATED = '… [обрізано]';
 
+/** Escapes text for Telegram HTML (also safe inside attribute values). */
 function escapeHtml(value) {
-  return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
-function line(label, value) {
-  return `<b>${escapeHtml(label)}:</b> ${escapeHtml(value)}`;
+/** Clickable contact: mailto: for email, https://t.me/ for a Telegram username. */
+function contactLine(contact) {
+  if (contact.type === 'email') {
+    return `✉️ <a href="mailto:${escapeHtml(contact.value)}">${escapeHtml(contact.value)}</a>`;
+  }
+  const username = contact.value.replace(/^@/, '');
+  return `💬 <a href="https://t.me/${escapeHtml(username)}">@${escapeHtml(username)}</a>`;
 }
+
+/** "27.11 22:26" in Europe/Warsaw (CET/CEST), independent of the server time zone. */
+function warsawTime(ms) {
+  const parts = Object.fromEntries(new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Europe/Warsaw', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23',
+  }).formatToParts(new Date(ms)).map((p) => [p.type, p.value]));
+  return `${parts.day}.${parts.month} ${parts.hour}:${parts.minute}`;
+}
+
+const teamLabel = (size) => (size === 'unknown' ? 'не вказано' : size.replace('-', '–'));
 
 /**
  * @param {object} lead            validated lead
  * @param {object} classification  { ok, result } or { ok: false, reason }
- * @param {object} meta            { consentAt: ISO string, flags: { spam, injection } }
+ * @param {object} meta            { consentTime: ms timestamp, flags: { spam, injection } }
  */
 function formatMessage(lead, classification, meta) {
-  const header = [];
-  const body = [];
   const r = classification.ok ? classification.result : null;
 
-  if (!r) {
-    header.push(`⚠️ <b>Заявка без класифікації</b> (AI: ${escapeHtml(classification.reason)})`);
-  } else {
-    if (meta.flags.injection) header.push('⚠️ <b>Можлива спроба prompt injection</b>');
-    if (meta.flags.spam) header.push('⚠️ <b>Можливий спам</b>');
-    header.push(`🆕 <b>Нова заявка</b> · ${escapeHtml(SERVICE_LABELS[r.service] || r.service)}`);
-  }
+  // Warnings always come first
+  const warnings = [];
+  if (!r) warnings.push(`⚠️ <b>Без класифікації</b> (AI: ${escapeHtml(classification.reason)})`);
+  if (meta.flags.injection) warnings.push('⚠️ <b>Можлива спроба prompt injection</b>');
+  if (meta.flags.spam) warnings.push('⚠️ <b>Можливий спам</b>');
+  if (r && r.reply_blocked) warnings.push('⚠️ Автовідповідь відвідувачу заблоковано: в ній були посилання або контакти');
 
-  body.push(line('Ім\'я', lead.name));
-  body.push(line('Контакт', lead.contact.value) + (lead.contact.type === 'telegram' ? ' (Telegram)' : ''));
-  body.push(line('Мова сайту', lead.uiLanguage));
+  const head = [
+    ...warnings,
+    '🆕 <b>Нова заявка</b>',
+    `📥 <b>${escapeHtml(r ? SERVICE_LABELS[r.service] || r.service : 'Послуга не визначена')}</b>`,
+    '',
+    `👤 <b>${escapeHtml(lead.name)}</b>`,
+    contactLine(lead.contact),
+    `🌐 Сайт: ${LANGUAGE_LABELS[lead.uiLanguage] || escapeHtml(lead.uiLanguage)}` +
+      (r ? ` · Заявка: ${LANGUAGE_LABELS[r.visitor_language] || escapeHtml(r.visitor_language)}` : ''),
+  ];
 
-  if (r) {
-    body.push('');
-    body.push(line('Процес', r.process || '—'));
-    body.push(line('Відділ', DEPARTMENT_LABELS[r.department]) + ' · ' + line('Терміновість', URGENCY_LABELS[r.urgency]) + ' · ' + line('Команда', r.team_size === 'unknown' ? 'не вказано' : r.team_size));
-    body.push(line('Мова заявки', LANGUAGE_LABELS[r.visitor_language]) + ' · ' + line('Спам', r.spam_likelihood));
-    body.push(line('Суть', r.summary || '—'));
-    body.push(line('Перше питання', r.first_question || '—'));
-    if (r.reply_blocked) body.push('<i>Автовідповідь відвідувачу заблоковано: в ній були посилання або контакти.</i>');
-  }
+  const analysis = r ? [
+    '',
+    '<b>📋 Розбір</b>',
+    `• Процес: ${escapeHtml(r.process || '—')}`,
+    `• Відділ: ${DEPARTMENT_LABELS[r.department] || escapeHtml(r.department)}`,
+    `• Команда: ${escapeHtml(teamLabel(r.team_size))}`,
+    `• Терміновість: ${URGENCY_LABELS[r.urgency] || escapeHtml(r.urgency)}`,
+    '',
+    '<b>💡 Суть</b>',
+    escapeHtml(r.summary || '—'),
+    '',
+    '<b>❓ Перше питання</b> (мовою клієнта)',
+    `<i>${escapeHtml(r.first_question || '—')}</i>`,
+  ] : [];
 
   const footer = [
     '',
-    line('Згода', `${meta.consentAt} UTC, версія тексту ${lead.consentVersion}`),
+    `<i>Згода ${escapeHtml(lead.consentVersion)} · ${warsawTime(meta.consentTime)} (Варшава) · спам: ${r ? escapeHtml(r.spam_likelihood) : '—'}</i>`,
   ];
 
   const build = (description) => [
-    ...header,
+    ...head,
+    ...analysis,
     '',
-    ...body,
-    '',
-    '<b>Оригінал:</b>',
-    `<blockquote expandable>${escapeHtml(description)}</blockquote>`,
+    `<blockquote expandable>📝 Оригінал заявки\n${escapeHtml(description)}</blockquote>`,
     ...footer,
   ].join('\n');
 
-  let message = build(lead.description);
   // Keep under Telegram's limit by shortening the original text if needed.
+  let message = build(lead.description);
   let keep = lead.description.length;
   while (message.length > TELEGRAM_LIMIT && keep > 0) {
-    keep = Math.max(0, keep - Math.max(50, message.length - TELEGRAM_LIMIT));
-    message = build(lead.description.slice(0, keep) + '… [обрізано]');
+    keep = Math.max(0, keep - Math.max(20, message.length - TELEGRAM_LIMIT));
+    message = build(lead.description.slice(0, keep).trimEnd() + TRUNCATED);
   }
   return message;
 }
@@ -111,4 +135,4 @@ async function sendTelegram(text, { fetch, token, chatId }) {
   }
 }
 
-module.exports = { TELEGRAM_LIMIT, escapeHtml, formatMessage, sendTelegram };
+module.exports = { TELEGRAM_LIMIT, escapeHtml, formatMessage, sendTelegram, warsawTime };

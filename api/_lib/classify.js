@@ -174,16 +174,18 @@ async function classifyLead(lead, { client, now = Date.now }) {
   let result = first.result;
   let problem = olenaFieldsProblem(result);
   if (problem) {
+    // Why the first answer was rejected; returned only in the Preview debug output
+    const retryReason = problem;
     if (now() - started < RETRY_BUDGET_MS) {
       const second = await requestClassification(lead, client, correctionFor(problem), RETRY_OPTIONS);
       if (second.ok) {
-        result = { ...second.result, retried: true };
+        result = { ...second.result, retried: true, retry_reason: retryReason };
         problem = olenaFieldsProblem(result);
       } else {
-        result = { ...result, retried: true, retry_failed: second.reason };
+        result = { ...result, retried: true, retry_reason: retryReason, retry_failed: second.reason };
       }
     } else {
-      result = { ...result, retry_skipped: 'time' };
+      result = { ...result, retry_skipped: 'time', retry_reason: retryReason };
     }
     // Still not Ukrainian: the lead goes to Olena as it is, with a warning
     if (problem) result.olena_language_problem = problem;

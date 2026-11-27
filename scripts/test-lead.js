@@ -302,6 +302,7 @@ test('Polish process and mixed summary (live test 3): one retry fixes it', async
   assert.ok(!correction.includes('obsługa') && !correction.includes('Firма'), 'no model or visitor text in the system prompt');
   assert.equal(r.body.reply, FIXED.reply_for_visitor);
   assert.equal(r.body.debug.classification.retried, true);
+  assert.deepEqual(r.body.debug.classification.retry_reason, { field: 'process', code: 'polish_letters', detail: 'Polish letters' });
   const text = r.telegram.calls[0].body.text;
   assert.ok(text.startsWith('🆕 <b>Нова заявка</b>'), 'no warning after a successful retry');
   assert.match(text, /• Процес: обробка заявок клієнтів з email і WhatsApp/);

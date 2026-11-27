@@ -6,7 +6,7 @@
 (function () {
   'use strict';
 
-  var SUPPORTED = ['en', 'pl', 'uk'];
+  var SUPPORTED = ['en', 'pl', 'uk', 'ru'];
   var DEFAULT_LANG = 'en'; // English is always the default; only a visitor's own choice overrides it
   var STORAGE_KEY = 'lang';
 

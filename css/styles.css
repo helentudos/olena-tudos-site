@@ -1154,8 +1154,12 @@ main:focus { outline: none; }
   .header-inner { gap: 8px; }
   .menu-toggle { padding: 0 10px; min-width: 44px; justify-content: center; }
   .header-actions { gap: 6px; }
-  .theme-toggle { width: 38px; height: 38px; }
-  .lang-switch button { min-width: 34px; padding: 0 6px; }
+  .container { padding: 0 16px; }
+  .brand { font-size: 0.98rem; }
+  .theme-toggle { width: 36px; height: 36px; }
+  .menu-toggle { min-width: 40px; padding: 0 8px; }
+  /* Four languages: narrower buttons, still well above the 24 px minimum target */
+  .lang-switch button { min-width: 29px; min-height: 34px; padding: 0 3px; font-size: 0.8rem; }
   .menu-toggle span {
     position: absolute; width: 1px; height: 1px; overflow: hidden;
     clip: rect(0 0 0 0); white-space: nowrap;
@@ -1283,11 +1287,15 @@ main:focus { outline: none; }
 
 /* Very narrow phones (e.g. 320 px): fit brand, theme, languages and menu in one row */
 @media (max-width: 359px) {
-  .container { padding: 0 16px; }
-  .brand { font-size: 0.95rem; }
-  .header-inner { gap: 6px; }
-  .header-actions { gap: 4px; }
-  .theme-toggle { width: 36px; height: 36px; }
-  .lang-switch button { min-width: 30px; padding: 0 4px; }
-  .menu-toggle { min-width: 40px; padding: 0 8px; }
+  /* Very narrow phones: the language switch moves to a second header row */
+  :root { --header-h: 104px; }
+  .header-inner { flex-wrap: wrap; gap: 6px; padding-block: 8px; min-height: 0; }
+  .header-actions { display: contents; }
+  .brand { order: 0; flex: 1 1 auto; font-size: 0.95rem; }
+  .theme-toggle { order: 1; }
+  .menu-toggle { order: 2; }
+  .lang-switch { order: 3; flex: 1 0 100%; justify-content: center; }
+  .lang-switch button { flex: 1; min-height: 32px; }
+  /* Long words (e.g. Russian "структурированные") must fit on one line */
+  .hero h1 { font-size: 1.6rem; }
 }

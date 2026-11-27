@@ -336,6 +336,40 @@ for (const [lang, reply] of [
   });
 }
 
+// ---------- narrower name guard (live test 7) ----------
+
+test('HTML in the visitor name does not block ordinary words (live test 7: "alerts")', async () => {
+  const reply = 'Thanks for the description: support gets 100+ tickets a day and the urgent ones get lost, so priorities and SLA alerts in Slack are needed.';
+  const r = await run(lead({ name: '<b>Bold</b> & <script>alert(1)</script>' }), { claude: claudeOk({ ...GOOD, reply_for_visitor: reply }) });
+  assert.equal(r.body.reply, `${reply} ${CLOSING.en}`);
+});
+
+test('capitalised words on their own are not names', async () => {
+  const reply = 'Thanks for the description: Support, Alerts and Priorities are needed in Slack and Excelsior.';
+  const r = await run(lead(), { claude: claudeOk({ ...GOOD, reply_for_visitor: reply }) });
+  assert.equal(r.body.reply, `${reply} ${CLOSING.en}`);
+});
+
+for (const [lang, reply, name] of [
+  ['en', 'Thanks: Helena will check the details.', 'Helena'],
+  ['en', 'Thanks for the description, Elena will check it.', 'Elena'],
+  ['pl', 'Dziękuję za opis, Alona sprawdzi szczegóły.', 'Alona'],
+  ['uk', 'Дякую за опис, Альона перевірить деталі.', 'Альона'],
+  ['ru', 'Спасибо за описание, Ольга проверит детали.', 'Ольга'],
+  ['en', 'Thanks for the description, Olga will check it.', 'Olga'],
+]) {
+  test(`variant of Olena's name is blocked: ${name}`, async () => {
+    const r = await run(lead(), { claude: claudeOk({ ...GOOD, visitor_language: lang, reply_for_visitor: reply }), env: { ...ENV, VERCEL_ENV: 'preview' }, headers: { 'x-lead-debug': '1' } });
+    assert.equal(r.body.reply, null);
+    assert.equal(r.body.debug.classification.reply_name, name);
+  });
+}
+
+test('declined forms of the visitor name are blocked (Анна → Анно)', async () => {
+  const r = await run(lead({ name: 'Анна' }), { claude: claudeOk({ ...GOOD, visitor_language: 'uk', reply_for_visitor: 'Дякую, Анно. Зрозуміло, що заявки губляться.' }) });
+  assert.equal(r.body.reply, null);
+});
+
 // ---------- process and summary must be Ukrainian: one retry (live test 3) ----------
 
 const LIVE_TEST_3 = {

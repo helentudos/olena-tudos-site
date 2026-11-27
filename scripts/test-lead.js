@@ -357,6 +357,27 @@ test('olenaTextProblem: what counts as Ukrainian for Olena', () => {
   assert.equal(code(''), 'empty');
 });
 
+test('hyphenated words with Latin acronyms are Ukrainian (live test 5)', () => {
+  const { olenaTextProblem: p } = require('../api/_lib/language');
+  for (const ok of ['SEO-посилання', 'CRM-система', 'IT-відділ', 'HR-запити', 'обробка запитів IT- та HR-відділів',
+    'Реклама онлайн-казино та SEO-посиланнями, продаж SEO-послуг', 'обробка e-mail заявок', 'API-інтеграція з n8n']) {
+    assert.equal(p(ok), null, ok);
+  }
+  // Two scripts inside one part of a word are still caught, with or without a hyphen
+  assert.equal(p('Firма-система для заявок').code, 'mixed_script');
+  assert.equal(p('SEOпосилання').code, 'mixed_script');
+});
+
+test('spam summary with SEO-посиланнями: no retry and no false ⚠️ (live test 5)', async () => {
+  const spam = { ...GOOD, spam_likelihood: 'high', process: 'реклама SEO-послуг і онлайн-казино',
+    summary: 'Реклама онлайн-казино та SEO-посиланнями, нерелевантна пропозиція.' };
+  const r = await run(lead(), { claude: claudeSequence(spam, FIXED) });
+  assert.equal(r.claude.calls.length, 1, 'no retry');
+  const text = r.telegram.calls[0].body.text;
+  assert.equal(text.split('\n')[0], '⚠️ <b>Можливий спам</b>');
+  assert.ok(!text.includes('summary не українською'));
+});
+
 // ---------- Claude failures: lead still reaches Olena as raw text ----------
 
 const failures = [

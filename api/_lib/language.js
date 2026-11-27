@@ -17,9 +17,11 @@
 const UKRAINIAN_ONLY = /[іїєґ]/i;
 const RUSSIAN_ONLY = /[ыэъё]/i;
 const POLISH_LETTERS = /[ąćęłńóśźż]/i;
-// Latin words that may appear in Ukrainian text for Olena besides capitalised or
-// all-caps names (Excel, WhatsApp, CRM) and words with digits (n8n, GPT-4o)
-const ALLOWED_LATIN_WORDS = new Set(['email', 'e-mail', 'online', 'offline', 'chatbot', 'chat-bot', 'bot', 'workflow', 'webhook', 'api', 'crm', 'erp', 'sla', 'pdf', 'excel']);
+// Latin words allowed in Ukrainian text for Olena, besides acronyms of 2–5 capitals
+// (SEO, CRM, IT, HR, API), capitalised tool names (Excel, WhatsApp) and words with
+// digits (n8n, GPT-4o). Checked per hyphen-separated part (live test 5).
+const ALLOWED_LATIN_WORDS = new Set(['email', 'e', 'mail', 'online', 'offline', 'chatbot', 'chat', 'bot', 'workflow', 'webhook', 'api', 'crm', 'erp', 'sla', 'pdf', 'excel']);
+const LATIN_ACRONYM = /^[A-Z]{2,5}$/;
 const MIN_CYRILLIC_SHARE = 0.8;
 
 function letterStats(text) {
@@ -58,12 +60,14 @@ function olenaTextProblem(text, { requireUkrainianLetter = false } = {}) {
 
   let cyrillic = 0;
   let latin = 0;
-  for (const word of s.match(/[\p{L}\p{N}][\p{L}\p{N}'’-]*/gu) || []) {
+  // Hyphenated words are checked part by part: "SEO-посилання", "CRM-система" and
+  // "IT-відділ" are normal Ukrainian; "Firма" (one part, two scripts) is not.
+  for (const word of s.match(/[\p{L}\p{N}'’]+/gu) || []) {
     const c = (word.match(/\p{Script=Cyrillic}/gu) || []).length;
     const l = (word.match(/\p{Script=Latin}/gu) || []).length;
     if (c && l) return { code: 'mixed_script', detail: `Latin and Cyrillic in one word: "${word}"` };
     if (l) {
-      const isName = /^[A-Z]/.test(word) || /\d/.test(word) || ALLOWED_LATIN_WORDS.has(word.toLowerCase());
+      const isName = LATIN_ACRONYM.test(word) || /^[A-Z]/.test(word) || /\d/.test(word) || ALLOWED_LATIN_WORDS.has(word.toLowerCase());
       if (!isName) latin += l;
     } else {
       cyrillic += c;

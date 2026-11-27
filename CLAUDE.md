@@ -84,7 +84,14 @@ Order: validate → spam checks → Claude → Telegram → reply to the visitor
 - **Spam or injection flagged by the AI** (`spam_likelihood: "high"` or `injection_suspected: true`): never dropped silently. The lead is sent to Olena with a ⚠️ mark, and the visitor sees the neutral confirmation.
 - **Claude:** model `claude-haiku-5-5` through the official SDK, `effort: "low"`, structured outputs with a strict JSON schema (enums wherever possible), a short timeout, and the result validated again in code. Fields: `service`, `process`, `department`, `urgency`, `team_size`, `summary`, `first_question`, `reply_for_visitor`, `visitor_language`, `spam_likelihood`, `injection_suspected`. `service` is one of the four services in `facts.md` or `other`; unknown facts are `unknown`, never guessed.
 - **Fallback:** on any Claude failure (timeout, API error, refusal, output that fails validation) the lead still reaches Olena as raw text, marked as unclassified, and the visitor sees a neutral confirmation.
-- **Telegram:** Bot API `sendMessage` with `parse_mode: "HTML"`; every dynamic value is HTML-escaped; the message stays under Telegram's 4096-character limit.
+- **Telegram:** Bot API `sendMessage` with `parse_mode: "HTML"`; every dynamic value is HTML-escaped (also inside link attributes); the message stays under Telegram's 4096-character limit by cutting the original text with a "… [обрізано]" mark. Layout, in Ukrainian:
+  - ⚠️ warnings first (no classification, possible injection, possible spam, blocked automatic reply);
+  - "🆕 Нова заявка" in bold, then the service in bold;
+  - contact block: name in bold, a clickable contact (`mailto:` for email, `https://t.me/` for a Telegram username), site language and inquiry language on one line;
+  - "📋 Розбір" list (process, department, team, urgency), "💡 Суть" in Ukrainian, "❓ Перше питання" in italics in the client's language;
+  - the original text in `<blockquote expandable>`;
+  - a small italic footer: consent version, time in Europe/Warsaw, spam likelihood.
+- **Field languages:** `process` and `summary` are always Ukrainian (they are for Olena), `first_question` and `reply_for_visitor` are in the visitor's language. The prompt states this in a separate block with an example, and the live tests check it (see `docs/test-log.md`, live test 1).
 - **If Telegram fails**, the visitor is told honestly that the message was not delivered and is shown the email and Telegram contacts (with no database yet, the lead would otherwise be lost).
 - **Visitor reply:** `reply_for_visitor` (2–3 sentences, the visitor's language, no promises about price or timing) is shown as plain text (`textContent`, length-capped) with a small label "Automatic reply · Olena will reply personally" in the page language, for transparency about AI. A reply containing a link, contact or markup is never shown. If the AI failed or flagged spam or an injection attempt, a neutral confirmation is shown instead.
 - **Debug output:** classification details are returned only when `VERCEL_ENV` is `preview` and the request has `x-lead-debug: 1` (used by the live test script); production never returns them.

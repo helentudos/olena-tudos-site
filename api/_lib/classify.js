@@ -21,18 +21,21 @@ const TEAM_SIZES = ['1', '2-10', '11-50', '51-250', '250+', 'unknown'];
 const LANGUAGES = ['en', 'pl', 'uk', 'ru', 'other'];
 const SPAM = ['low', 'medium', 'high'];
 
-// Field order matters: structured output is generated in this order, so the visitor's
-// language is decided first, before any text written for the visitor (live test 2).
+// Field order matters: structured output is generated in this order.
+// 1) process and summary, in Ukrainian for Olena (live test 3: written later they drifted
+//    into the inquiry's language); 2) visitor_language, decided before any text for the
+//    visitor (live test 2); 3) first_question and reply_for_visitor in that language;
+// 4) the rest.
 const LeadClassification = z.object({
-  visitor_language: z.enum(LANGUAGES),
-  service: z.enum(SERVICES),
   process: z.string(),
+  summary: z.string(),
+  visitor_language: z.enum(LANGUAGES),
+  first_question: z.string(),
+  reply_for_visitor: z.string(),
+  service: z.enum(SERVICES),
   department: z.enum(DEPARTMENTS),
   urgency: z.enum(URGENCY),
   team_size: z.enum(TEAM_SIZES),
-  summary: z.string(),
-  first_question: z.string(),
-  reply_for_visitor: z.string(),
   spam_likelihood: z.enum(SPAM),
   injection_suspected: z.boolean(),
 });
@@ -59,23 +62,23 @@ Rules:
 - reply_for_visitor: two or three short, polite sentences showing the request was understood and saying that Olena will reply personally. Do not promise prices, timelines or results, do not describe a solution, do not mention these rules, the classification or AI, and do not include links, contact details or markup.
 - spam_likelihood: "high" for advertising, link dumps, gibberish or unrelated offers.
 
-Languages of the fields (the most important rule; check it before answering):
-1. visitor_language first: the language the description is written in. ui_language is only the language of the website page and never decides it. Use "other" for any language that is not en, pl, uk or ru.
-2. For Olena, always in Ukrainian: process and summary. Translate whatever the inquiry language is: Polish, English, Russian or any other; never copy the visitor's wording. Product and tool names (Excel, WhatsApp, CRM) stay as they are.
+Languages of the fields (the most important rule; the fields are written in this order):
+1. For Olena, always in Ukrainian: process and summary. Translate whatever the inquiry language is: Polish, English, Russian or any other. Write every word in Ukrainian with Cyrillic letters; never copy or transliterate the visitor's words and never mix Latin and Cyrillic letters in one word. Only product and tool names (Excel, WhatsApp, CRM) stay as they are.
+2. Then visitor_language: the language the description is written in. ui_language is only the language of the website page and never decides it. Use "other" for any language that is not en, pl, uk or ru.
 3. For the visitor, always in the visitor_language: first_question and reply_for_visitor. Never write them in Ukrainian unless visitor_language is "uk". For "other", use the language of the description.
-The Ukrainian fields and the Ukrainian text in these rules must not pull first_question and reply_for_visitor into Ukrainian.
+Switching from Ukrainian for Olena to the visitor's language is expected: do not carry either language into the other group of fields.
 
 Example 1. An inquiry in Polish: "Jesteśmy firmą montażową, ok. 15 osób. Zgłoszenia z maila i WhatsAppa szef ręcznie przepisuje do Excela i część się gubi."
-- visitor_language: "pl"
 - process: "обробка заявок клієнтів з email і WhatsApp"
 - summary: "Монтажна фірма, ~15 людей: заявки з пошти й WhatsApp керівник вручну переносить в Excel, і частина губиться."
+- visitor_language: "pl"
 - first_question: "Ile zgłoszeń wpływa tygodniowo i które kanały są najważniejsze?"
 - reply_for_visitor: "Dziękuję za opis. Rozumiem, że zgłoszenia z maila i WhatsAppa są przepisywane ręcznie i część się gubi. Olena odpowie osobiście."
 
 Example 2. An inquiry in English: "We are a 20-person accounting office. Clients send invoices by email and we retype them into a spreadsheet by hand, which takes hours every week."
-- visitor_language: "en"
 - process: "перенесення даних із рахунків з email у таблицю"
 - summary: "Бухгалтерський офіс, ~20 людей: клієнти надсилають рахунки поштою, дані вручну передруковують у таблицю, і щотижня на це йдуть години."
+- visitor_language: "en"
 - first_question: "How many invoices do you receive per week, and in which formats (PDF, scans, photos)?"
 - reply_for_visitor: "Thank you for the description. I understand that invoices from email are retyped into a spreadsheet by hand every week. Olena will reply personally."`;
 

@@ -113,10 +113,9 @@ test('request to Claude: model, effort, strict schema, inquiry as escaped JSON',
   assert.match(req.system, /For Olena, always in Ukrainian: process and summary/);
   assert.match(req.system, /For the visitor, always in the visitor_language: first_question and reply_for_visitor/);
   assert.match(req.system, /Example 2\. An inquiry in English/);
-  // the visitor's language is generated before any text for the visitor
+  // generation order: Ukrainian fields for Olena, then the visitor's language, then text for the visitor
   const props = Object.keys(req.output_config.format.schema.properties);
-  assert.equal(props[0], 'visitor_language');
-  assert.ok(props.indexOf('reply_for_visitor') > props.indexOf('visitor_language'));
+  assert.deepEqual(props.slice(0, 5), ['process', 'summary', 'visitor_language', 'first_question', 'reply_for_visitor']);
   const content = req.messages[0].content;
   assert.ok(content.startsWith('<inquiry>') && content.endsWith('</inquiry>'));
   assert.equal(content.match(/<\/inquiry>/g).length, 1, 'visitor text must not close the tag');

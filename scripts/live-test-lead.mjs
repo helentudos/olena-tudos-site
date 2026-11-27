@@ -21,7 +21,7 @@ import { fileURLToPath } from 'node:url';
 
 // Bump when the checks change, so an outdated copy (for example from an old ZIP) is
 // easy to spot in the output (live test 6).
-const CHECKS_VERSION = '2026-11-28 · live test 6: names and closing sentence';
+const CHECKS_VERSION = '2026-11-28 · live test 6: names and closing sentence in code';
 function scriptCommit() {
   try {
     return execSync('git rev-parse --short HEAD', { cwd: dirname(fileURLToPath(import.meta.url)), stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim();
@@ -31,7 +31,10 @@ function scriptCommit() {
 }
 
 // The same language check the server uses to block a reply in the wrong language
-const { textMatchesLanguage, olenaTextProblem } = createRequire(import.meta.url)('../api/_lib/language.js');
+const requireCjs = createRequire(import.meta.url);
+const { textMatchesLanguage, olenaTextProblem } = requireCjs('../api/_lib/language.js');
+// The visitor reply rules the server applies: fixed closing sentence, no names (live test 6)
+const { CLOSINGS, closingFor, findNameLike } = requireCjs('../api/_lib/reply.js');
 
 const PRODUCTION_HOST = 'olena-tudos-site.vercel.app';
 const args = process.argv.slice(2);
@@ -124,7 +127,7 @@ const cases = [
     plain(403, (b) => b.error === 'origin'), { origin: 'https://evil.example' }],
 ];
 
-function checkAi(name, res, expect) {
+function checkAi(name, res, expect, fields) {
   const problems = [];
   const b = res.body;
   const d = b.debug;
@@ -158,6 +161,19 @@ function checkAi(name, res, expect) {
     problems.push(`reply_for_visitor in the wrong language (the guard hid it from the visitor): "${String(c.reply_rejected).slice(0, 80)}"`);
   } else if (!flagged && !c.reply_blocked && !b.reply) {
     problems.push('expected an automatic reply for the visitor');
+  }
+  if (c.reply_name_found) problems.push(`reply hidden because of a name: «${c.reply_name}» in "${String(c.reply_rejected).slice(0, 80)}"`);
+  // Visible reply: the model's sentences plus exactly one closing sentence in the reply
+  // language (English for "other"), and no names in the model's part (live test 6)
+  if (b.reply) {
+    const closing = closingFor(c.visitor_language);
+    const closingsFound = Object.values(CLOSINGS).reduce((n, text) => n + (b.reply.split(text).length - 1), 0);
+    if (!b.reply.endsWith(closing)) problems.push(`reply does not end with the closing "${closing}": "${b.reply.slice(-60)}"`);
+    if (closingsFound !== 1) problems.push(`reply has ${closingsFound} closing sentences, expected exactly 1`);
+    const modelPart = b.reply.endsWith(closing) ? b.reply.slice(0, -closing.length).trim() : b.reply;
+    const visitorName = String(fields.name || '').replace('[TEST]', '').trim();
+    const nameFound = findNameLike(modelPart, { lang: c.visitor_language, visitorName });
+    if (nameFound) problems.push(`reply contains a name: «${nameFound}»`);
   }
   const lang = expect.language;
   if (['en', 'pl', 'uk', 'ru'].includes(lang)) {
@@ -230,7 +246,7 @@ for (const [name, fields, expect, headers] of selected) {
     continue;
   }
   const problems = expect.kind === 'ai'
-    ? checkAi(name, res, expect.checks)
+    ? checkAi(name, res, expect.checks, fields)
     : (res.status === expect.status && expect.check(res.body) ? [] : [`HTTP ${res.status} ${JSON.stringify(res.body).slice(0, 200)}`]);
 
   const c = res.body.debug && res.body.debug.classification;

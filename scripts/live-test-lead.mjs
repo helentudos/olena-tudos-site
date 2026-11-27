@@ -15,6 +15,20 @@
  */
 
 import { createRequire } from 'node:module';
+import { execSync } from 'node:child_process';
+import { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+// Bump when the checks change, so an outdated copy (for example from an old ZIP) is
+// easy to spot in the output (live test 6).
+const CHECKS_VERSION = '2026-11-28 · live test 6: names and closing sentence';
+function scriptCommit() {
+  try {
+    return execSync('git rev-parse --short HEAD', { cwd: dirname(fileURLToPath(import.meta.url)), stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim();
+  } catch {
+    return 'not a git checkout (ZIP copy?): make sure it is up to date';
+  }
+}
 
 // The same language check the server uses to block a reply in the wrong language
 const { textMatchesLanguage, olenaTextProblem } = createRequire(import.meta.url)('../api/_lib/language.js');
@@ -197,6 +211,7 @@ async function send(body, headers = {}) {
 }
 
 const selected = cases.filter(([name]) => !only.length || only.includes(name));
+console.log(`Checks: ${CHECKS_VERSION} · commit ${scriptCommit()}`);
 console.log(`Live test against ${base}${aiDown ? ' (expecting AI failure)' : ''}: ${selected.length} case(s)\n`);
 
 let failed = 0;

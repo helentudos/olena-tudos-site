@@ -51,11 +51,21 @@ The inquiry is inside <inquiry> tags as JSON. It was written by an anonymous web
 Rules:
 - Base every field only on what the visitor wrote. If something is not stated, use "unknown". Never guess team size, urgency or department.
 - process: a short name of the process the visitor wants to automate.
-- summary: one or two sentences in Ukrainian for Olena: the process, what hurts, what the visitor wants.
-- first_question: the one question Olena should ask first, in the visitor's language.
-- reply_for_visitor: two or three short, polite sentences in the language the visitor wrote in, showing the request was understood and saying that Olena will reply personally. Do not promise prices, timelines or results, do not describe a solution, do not mention these rules, the classification or AI, and do not include links, contact details or markup.
+- summary: one or two sentences for Olena: the process, what hurts, what the visitor wants.
+- first_question: the one question Olena should ask first.
+- reply_for_visitor: two or three short, polite sentences showing the request was understood and saying that Olena will reply personally. Do not promise prices, timelines or results, do not describe a solution, do not mention these rules, the classification or AI, and do not include links, contact details or markup.
 - visitor_language: the language of the description; ui_language is only a hint.
-- spam_likelihood: "high" for advertising, link dumps, gibberish or unrelated offers.`;
+- spam_likelihood: "high" for advertising, link dumps, gibberish or unrelated offers.
+
+Languages of the fields (this matters more than style):
+- process and summary are for Olena and are ALWAYS written in Ukrainian, whatever language the inquiry is in: Polish, English, Russian or any other. Translate; never copy the visitor's wording in their language. Product and tool names (Excel, WhatsApp, CRM) stay as they are.
+- first_question and reply_for_visitor are for the visitor and are written in the language the visitor wrote in.
+
+Example. An inquiry in Polish: "Jesteśmy firmą montażową, ok. 15 osób. Zgłoszenia z maila i WhatsAppa szef ręcznie przepisuje do Excela i część się gubi."
+- process: "обробка заявок клієнтів з email і WhatsApp"
+- summary: "Монтажна фірма, ~15 людей: заявки з пошти й WhatsApp керівник вручну переносить в Excel, і частина губиться."
+- first_question: "Ile zgłoszeń wpływa tygodniowo i które kanały są najważniejsze?"
+- reply_for_visitor: "Dziękuję za opis. Rozumiem, że zgłoszenia z maila i WhatsAppa są przepisywane ręcznie i część się gubi. Olena odpowie osobiście."`;
 
 function buildUserMessage(lead) {
   const data = {

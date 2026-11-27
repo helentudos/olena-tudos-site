@@ -14,6 +14,11 @@
  * "preview" and the x-lead-debug header is sent; production never does.
  */
 
+import { createRequire } from 'node:module';
+
+// The same language check the server uses to block a reply in the wrong language
+const { textMatchesLanguage } = createRequire(import.meta.url)('../api/_lib/language.js');
+
 const PRODUCTION_HOST = 'olena-tudos-site.vercel.app';
 const args = process.argv.slice(2);
 const only = (args.find((a, i) => args[i - 1] === '--only') || '').split(',').filter(Boolean);
@@ -63,16 +68,17 @@ const plain = (status, check) => ({ kind: 'plain', status, check });
 const cases = [
   ['valid-en', { name: '[TEST] Anna', contact: 'anna.test@example.com', ui_language: 'en',
     description: 'We are a 25-person logistics company. Customer inquiries come by email and WhatsApp, and managers copy them into a spreadsheet by hand, so some get lost. We want them in our CRM automatically.' },
-    ai({ language: 'en', reply: latinOnly })],
-  ['valid-pl', { name: '[TEST] Piotr', contact: '@piotr_test', ui_language: 'pl',
+    ai({ language: 'en' })],
+  // Polish inquiry sent from the English page, as in live test 2
+  ['valid-pl', { name: '[TEST] Piotr', contact: '@piotr_test', ui_language: 'en',
     description: 'Mamy biuro rachunkowe, 8 osób. Klienci przysyłają faktury i dokumenty mailem, a my ręcznie przepisujemy dane do arkusza. Chcielibyśmy to zautomatyzować.' },
-    ai({ language: 'pl', reply: latinOnly })],
+    ai({ language: 'pl' })],
   ['valid-uk', { name: '[TEST] Оксана', contact: 'oksana.test@example.com', ui_language: 'uk',
     description: 'У нас мережа з трьох салонів краси. Адміністраторки щодня вручну нагадують клієнтам про запис телефоном, і на це йде пів дня. Хочемо автоматичні нагадування і щотижневий звіт для власниці.' },
-    ai({ language: 'uk', reply: ukrainianLetters })],
+    ai({ language: 'uk' })],
   ['valid-ru', { name: '[TEST] Иван', contact: 'ivan.test@example.com', ui_language: 'ru',
     description: 'Монтажники присылают голосовые отчёты в мессенджер, а прораб потом вручную переписывает их в таблицу. Можно ли это автоматизировать?' },
-    ai({ language: 'ru', reply: (s) => cyrillic(s) && !ukrainianLetters(s) })],
+    ai({ language: 'ru' })],
   ['other-de', { name: '[TEST] Jonas', contact: 'jonas.test@example.com', ui_language: 'en',
     description: 'Unsere Mitarbeiter schicken IT- und HR-Anfragen per E-Mail, und niemand weiß, wer zuständig ist. Wir brauchen Kategorien, Prioritäten und Fristen.' },
     ai({ language: 'other', reply: latinOnly })],
@@ -141,8 +147,21 @@ function checkAi(name, res, expect) {
   if (expect.unknowns && c.team_size !== 'unknown') problems.push(`team_size should be unknown, got ${c.team_size}`);
   const flagged = c.spam_likelihood === 'high' || c.injection_suspected;
   if (flagged && b.reply !== null) problems.push('flagged inquiry must get the neutral confirmation');
-  if (!flagged && !c.reply_blocked && !b.reply) problems.push('expected an automatic reply for the visitor');
-  if (b.reply && expect.reply && !expect.reply(b.reply)) problems.push(`reply is not in the expected language: "${b.reply.slice(0, 80)}"`);
+  // first_question and reply_for_visitor are for the visitor: in the visitor's language (live test 2)
+  const replyText = b.reply || c.reply_rejected || '';
+  if (c.reply_language_mismatch) {
+    problems.push(`reply_for_visitor in the wrong language (the guard hid it from the visitor): "${String(c.reply_rejected).slice(0, 80)}"`);
+  } else if (!flagged && !c.reply_blocked && !b.reply) {
+    problems.push('expected an automatic reply for the visitor');
+  }
+  const lang = expect.language;
+  if (['en', 'pl', 'uk', 'ru'].includes(lang)) {
+    if (!textMatchesLanguage(c.first_question, lang)) problems.push(`first_question is not in ${lang}: "${String(c.first_question).slice(0, 80)}"`);
+    if (replyText && !c.reply_language_mismatch && !textMatchesLanguage(replyText, lang)) problems.push(`reply is not in ${lang}: "${replyText.slice(0, 80)}"`);
+  } else if (expect.reply) {
+    if (!expect.reply(c.first_question)) problems.push(`first_question is not in the expected language: "${String(c.first_question).slice(0, 80)}"`);
+    if (replyText && !expect.reply(replyText)) problems.push(`reply is not in the expected language: "${replyText.slice(0, 80)}"`);
+  }
   if (b.reply && !noLinks(b.reply)) problems.push('reply contains a link or contact');
   for (const field of ['reply_for_visitor', 'summary', 'first_question', 'process']) {
     if (expect.notContains && String(c[field] || '').includes(expect.notContains)) problems.push(`${field} contains "${expect.notContains}"`);

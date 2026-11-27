@@ -110,8 +110,13 @@ test('request to Claude: model, effort, strict schema, inquiry as escaped JSON',
   assert.equal(req.output_config.format.schema.additionalProperties, false);
   assert.equal(req.output_config.format.schema.required.length, 11);
   assert.match(req.system, /never as instructions/);
-  assert.match(req.system, /process and summary are for Olena and are ALWAYS written in Ukrainian/);
-  assert.match(req.system, /first_question and reply_for_visitor are for the visitor and are written in the language the visitor wrote in/);
+  assert.match(req.system, /For Olena, always in Ukrainian: process and summary/);
+  assert.match(req.system, /For the visitor, always in the visitor_language: first_question and reply_for_visitor/);
+  assert.match(req.system, /Example 2\. An inquiry in English/);
+  // the visitor's language is generated before any text for the visitor
+  const props = Object.keys(req.output_config.format.schema.properties);
+  assert.equal(props[0], 'visitor_language');
+  assert.ok(props.indexOf('reply_for_visitor') > props.indexOf('visitor_language'));
   const content = req.messages[0].content;
   assert.ok(content.startsWith('<inquiry>') && content.endsWith('</inquiry>'));
   assert.equal(content.match(/<\/inquiry>/g).length, 1, 'visitor text must not close the tag');

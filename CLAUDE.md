@@ -120,7 +120,7 @@ Order: validate → spam checks → Claude → Telegram → reply to the visitor
 ## Hosting
 
 - **Vercel**, free plan (Hobby).
-- The inquiry form will come later and will be handled by a **Vercel serverless function** (`api/` folder).
+- The inquiry form is handled by a **Vercel serverless function** (`api/lead.js`); merging into `main` deploys it to production, so the Production environment variables must be set first.
 
 ## Security
 

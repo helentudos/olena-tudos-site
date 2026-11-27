@@ -2,6 +2,32 @@
 
 Live tests of the inquiry form run against a Vercel **Preview** deployment with the real Claude API and Telegram (`scripts/live-test-lead.mjs`, see the README). Each entry records what was tested, what was found and what changed. Newest first.
 
+## Live test 3 — reply and first_question language fixed; process/summary in Polish or mixed — found and fixed with field order and validation + retry
+
+- **Date:** 2026-11-27
+- **Where:** a new Preview deployment of `claude/create-claude-md-rules-fgkppd`, run by Olena
+- **Case:** an inquiry in Polish sent from the English version of the page
+
+**Confirmed:** `reply_for_visitor` and `first_question` now arrive in Polish. The fix from live test 2 works.
+
+**Found:** `process` was in Polish again, and `summary` mixed scripts, even inside words: «Firма montażowa, ок. 15 людей: заявки клієнтів…».
+
+**Likely cause:** after live test 2, `visitor_language` was generated first and the Polish fields for the visitor came right after it; `process` and `summary` were generated later, mid-way between Polish texts, and drifted into Polish or a mix.
+
+**Fix:**
+
+- **Field order:** `process` and `summary` (Ukrainian, for Olena) are now generated first, then `visitor_language`, then `first_question` and `reply_for_visitor` (the visitor's language), then the rest. The prompt's numbered steps and both examples follow the same order, and the prompt now forbids mixing Latin and Cyrillic letters in a word.
+- **Validation** (`olenaTextProblem` in `api/_lib/language.js`): `process` and `summary` fail on Polish letters (ąćęłńóśźż), on a word that mixes Latin and Cyrillic letters, on less than 80% Cyrillic among the letters (capitalised or all-caps names such as Excel, WhatsApp, CRM, words with digits and a few common words such as email do not count), on Russian-only letters, and, for a longer `summary`, on missing Ukrainian letters.
+- **One retry:** on a failure, Claude is asked once more with a short correction in the system prompt. The correction is built only from fixed codes, never from model or visitor text, so the visitor cannot inject instructions through it. The retry has its own 8-second timeout and is skipped if the first answer took more than 14 seconds, so the function stays within its 30-second limit.
+- **If the retry does not help** (or fails, or is skipped), the lead goes to Olena as it is, with "⚠️ summary не українською" and the reason as the first line in Telegram. The visitor is not affected.
+- **Tests:** `scripts/test-lead.js` (65 tests) covers the exact text from this live test, a successful retry, a failed second answer, a failed retry request and the time budget; disabling the check fails 5 tests. `scripts/live-test-lead.mjs` now uses the same check as the server and shows when a retry happened.
+
+**Also changed:** the "Automatic reply · Olena will reply personally" label under the reply was removed at Olena's request; the AI processing is disclosed in the consent text.
+
+**Known limit:** short Russian text without ы, э, ъ or ё is not told apart from Ukrainian.
+
+**Status:** fixed in code; to be confirmed by live test 4.
+
 ## Live test 2 — summary language fixed; regression: first_question and reply_for_visitor in Ukrainian — found and fixed
 
 - **Date:** 2026-11-27

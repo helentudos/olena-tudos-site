@@ -21,20 +21,21 @@ Goal of the page: clients and employers quickly understand how Olena can help, s
 
 ## Languages
 
-- The site has three languages: **English (en)**, **Polish (pl)**, **Ukrainian (uk)**.
+- The site has four languages: **English (en)**, **Polish (pl)**, **Ukrainian (uk)**, **Russian (ru)**.
 - **English is the default language.** The page opens in English unless the visitor has chosen another language before; the browser language is not used.
-- The language switcher lists **EN first**, then PL and UA. The chosen language is remembered between visits, and the `lang` attribute on `<html>` is updated.
+- The language switcher lists **EN first**, then PL, UA and RU. The chosen language is remembered between visits, and the `lang` attribute on `<html>` is updated.
 - **All texts live in separate translation files** (one per language), referenced from HTML by keys (for example `data-i18n="hero.title"`).
 - The English text inside `index.html` is **generated** from `i18n/en.js` by `node scripts/prerender.js`, so the page works without JavaScript and search engines see the content. Never edit text in `index.html` by hand: change the translation file and run the script. `node scripts/prerender.js --check` fails if the HTML is out of date.
 - Without JavaScript the page is shown in English; the language and theme switches and the mobile menu button are hidden, and the menu is shown as a plain list.
-- New keys are added to all three files at once. If a translation is not ready yet, the key is marked as such; text is never invented.
+- New keys are added to all four files at once. If a translation is not ready yet, the key is marked as such; text is never invented.
 
 ## Stack and layout
 
 - Plain **HTML, CSS and JavaScript** with no frameworks, libraries or bundlers in the browser.
 - The only exception is the serverless function in `api/`: it may use the official Anthropic SDK (`@anthropic-ai/sdk`) and `zod` from `package.json`. Nothing from `node_modules` is ever sent to the browser.
 - **Single page**.
-- **Mobile-first**: base styles target phones; larger screens are handled with `min-width` media queries.
+- **Mobile-first**: base styles target phones; larger screens are handled with `min-width` media queries. The header (brand, theme toggle, four language buttons, menu) must fit from 320 px; below 360 px the language buttons move to a second header row.
+- No animated element may carry a CSS `filter` on phones: it makes mobile browsers repaint every frame (the hero shadow is desktop-only in both themes).
 - **Accessibility** (a11y):
   - sufficient text contrast (WCAG AA: 4.5:1 for normal text, 3:1 for large text);
   - meaningful `alt` for every image (empty `alt=""` only for decorative ones);
@@ -64,7 +65,7 @@ The form follows the site's own pattern: incoming text → AI structures it → 
 
 - Fields: **name** (2–80 characters), **contact** (an email address or a Telegram username, up to 100), **process description** (20–2000), a required **consent checkbox**, a hidden **honeypot** field and a hidden form-start time. The current UI language is sent along.
 - The same limits are checked in the browser and in `api/lead.js`; the server is the authority and rejects anything else.
-- All texts (labels, hints, errors, consent, success and failure messages) live in the translation files, in all three languages, and the English ones are prerendered like the rest of the page.
+- All texts (labels, hints, errors, consent, success and failure messages) live in the translation files, in all four languages, and the English ones are prerendered like the rest of the page.
 
 ### Consent and privacy (RODO/GDPR)
 

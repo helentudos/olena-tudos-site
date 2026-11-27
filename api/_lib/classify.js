@@ -9,6 +9,7 @@
 
 const { z } = require('zod');
 const Anthropic = require('@anthropic-ai/sdk').default;
+const { textMatchesLanguage } = require('./language');
 const { zodOutputFormat } = require('@anthropic-ai/sdk/helpers/zod');
 
 const MODEL = 'claude-haiku-5-5';
@@ -138,6 +139,12 @@ async function classifyLead(lead, { client }) {
   if (!result.reply_for_visitor || replyLooksUnsafe(result.reply_for_visitor)) {
     result.reply_for_visitor = '';
     result.reply_blocked = true;
+  } else if (!textMatchesLanguage(result.reply_for_visitor, result.visitor_language)) {
+    // The visitor must never get a reply in another language (live test 2):
+    // hide it, keep it for debugging on Preview, and warn Olena.
+    result.reply_rejected = result.reply_for_visitor;
+    result.reply_for_visitor = '';
+    result.reply_language_mismatch = true;
   }
   return { ok: true, result };
 }

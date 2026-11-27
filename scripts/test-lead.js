@@ -124,7 +124,9 @@ test('request to Claude: model, effort, strict schema, inquiry as escaped JSON',
 
 for (const [lang, contact] of [['pl', '@anna_pl'], ['uk', 'https://t.me/anna_ua'], ['ru', '@anna_ru']]) {
   test(`valid inquiry in ${lang} with a Telegram contact`, async () => {
-    const r = await run(lead({ ui_language: lang, contact }), { claude: claudeOk({ ...GOOD, visitor_language: lang }) });
+    const reply = { pl: 'Dziękuję za opis. Olena odpowie osobiście.', uk: 'Дякую за опис. Олена відповість особисто.', ru: 'Спасибо за описание. Елена ответит лично.' }[lang];
+    const r = await run(lead({ ui_language: lang, contact }), { claude: claudeOk({ ...GOOD, visitor_language: lang, reply_for_visitor: reply }) });
+    assert.equal(r.body.reply, reply);
     assert.equal(r.status, 200);
     assert.equal(r.body.replyLanguage, lang);
     assert.match(r.telegram.calls[0].body.text, /💬 <a href="https:\/\/t\.me\/anna_(pl|ua|ru)">@anna_(pl|ua|ru)<\/a>/);
@@ -225,6 +227,49 @@ test('long AI fields are capped', async () => {
   const r = await run(lead(), { claude: claudeOk({ ...GOOD, reply_for_visitor: 'Thanks. '.repeat(200), summary: 'с'.repeat(1000) }) });
   assert.ok(r.body.reply.length <= 600);
   assert.ok(!r.telegram.calls[0].body.text.includes('с'.repeat(401)));
+});
+
+// ---------- automatic reply in the wrong language (live test 2) ----------
+
+const LIVE_TEST_2_REPLY = 'Дякую за опис. Розумію, що заявки з пошти та WhatsApp переносяться вручну і частина з них губиться. Олена відповість вам особисто.';
+
+test('Ukrainian reply to a Polish inquiry (live test 2): neutral confirmation, ⚠️ to Olena', async () => {
+  const r = await run(lead({ ui_language: 'en' }), { claude: claudeOk({ ...GOOD, visitor_language: 'pl', reply_for_visitor: LIVE_TEST_2_REPLY }), env: { ...ENV, VERCEL_ENV: 'preview' }, headers: { 'x-lead-debug': '1' } });
+  assert.equal(r.status, 200);
+  assert.equal(r.body.reply, null);
+  assert.equal(r.body.debug.classification.reply_rejected, LIVE_TEST_2_REPLY, 'kept for debugging on Preview');
+  const text = r.telegram.calls[0].body.text;
+  assert.match(text.split('\n')[0], /^⚠️ Мова автовідповіді не збіглася з мовою заявки/);
+  assert.ok(!text.includes(LIVE_TEST_2_REPLY), 'the rejected reply is not forwarded');
+});
+
+for (const [visitor, reply, shown] of [
+  ['en', 'Thank you, I understand the problem. Olena will reply personally.', true],
+  ['en', 'Дякую, Олена відповість особисто.', false],
+  ['uk', 'Спасибо, Елена ответит лично.', false],
+  ['ru', 'Дякую, Олена відповість особисто.', false],
+  ['ru', 'Спасибо, Елена ответит лично.', true],
+  ['uk', 'Thank you, Olena will reply personally.', false],
+  ['other', 'Danke für die Beschreibung. Olena antwortet persönlich.', true],
+]) {
+  test(`reply language guard: ${visitor} visitor, reply "${reply.slice(0, 22)}…" ${shown ? 'shown' : 'hidden'}`, async () => {
+    const r = await run(lead(), { claude: claudeOk({ ...GOOD, visitor_language: visitor, reply_for_visitor: reply }) });
+    assert.equal(r.body.reply, shown ? reply : null);
+    assert.equal(/Мова автовідповіді не збіглася/.test(r.telegram.calls[0].body.text), !shown);
+  });
+}
+
+test('textMatchesLanguage: scripts and language-specific letters', () => {
+  const { textMatchesLanguage: m } = require('../api/_lib/language');
+  assert.equal(m('Dziękuję, Olena odpowie osobiście.', 'pl'), true);
+  assert.equal(m(LIVE_TEST_2_REPLY, 'pl'), false);
+  assert.equal(m('Thank you, Олена', 'en'), false, 'any Cyrillic breaks a Latin language');
+  assert.equal(m('Дякую! Олена відповість.', 'uk'), true);
+  assert.equal(m('Спасибо! Елена ответит лично.', 'uk'), false);
+  assert.equal(m('Спасибо! Елена ответит лично.', 'ru'), true);
+  assert.equal(m('Дякую! Олена відповість.', 'ru'), false);
+  assert.equal(m('', 'en'), false);
+  assert.equal(m('anything at all', 'other'), true);
 });
 
 // ---------- Claude failures: lead still reaches Olena as raw text ----------

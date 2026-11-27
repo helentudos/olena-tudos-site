@@ -62,6 +62,7 @@ function formatMessage(lead, classification, meta) {
   if (meta.flags.injection) warnings.push('⚠️ <b>Можлива спроба prompt injection</b>');
   if (meta.flags.spam) warnings.push('⚠️ <b>Можливий спам</b>');
   if (r && r.reply_blocked) warnings.push('⚠️ Автовідповідь відвідувачу заблоковано: в ній були посилання або контакти');
+  if (r && r.reply_language_mismatch) warnings.push('⚠️ Мова автовідповіді не збіглася з мовою заявки: відвідувач побачив нейтральне підтвердження');
 
   const head = [
     ...warnings,
